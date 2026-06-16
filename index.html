@@ -198,15 +198,16 @@
         <section id="page-ocr-scanner" class="hidden max-w-md mx-auto space-y-4">
             <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border-2 border-gray-700 shadow-2xl">
                 <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
-                <div id="focus-area" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-16 border-2 border-red-500 rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.65)] pointer-events-none">
+                <div id="focus-area" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-14 border-2 border-red-500 rounded shadow-[0_0_0_9999px_rgba(0,0,0,0.65)] pointer-events-none">
                     <div class="laser-line absolute left-0 right-0 h-[2px] bg-red-400 shadow-[0_0_8px_#ef4444]"></div>
-                    <span class="absolute -bottom-5 left-0 right-0 text-center text-[9px] uppercase font-bold text-red-400 tracking-widest">Posisikan Kode Angka di Sini</span>
+                    <span class="absolute -bottom-4 left-0 right-0 text-center text-[8px] uppercase font-bold text-red-400 tracking-widest">Pindai Otomatis Barcode</span>
                 </div>
             </div>
 
-            <button id="snapBtn" class="w-full p-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg flex justify-center items-center gap-2 transition active:scale-95">
-                <span>📸</span> <span id="btn-text">PINDAI KODE SEKARANG</span>
-            </button>
+            <div id="snapBtn" class="w-full p-3.5 bg-gray-800 text-emerald-400 border border-gray-700 font-bold rounded-xl shadow-lg flex justify-center items-center gap-2 text-xs tracking-wider">
+                <span class="animate-ping w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span id="btn-text">RADAR SCANNER OTOMATIS AKTIF</span>
+            </div>
             <canvas id="hidden-canvas" class="hidden"></canvas>
 
             <div id="result-card" class="bg-gray-800 border border-gray-700 rounded-2xl p-5 shadow-2xl hidden animate-fade-in">
@@ -283,10 +284,17 @@
         let ocrWorker = null;
         let streamTrack = null;
         let activePage = 'role-selection';
+        let autoScanInterval = null; // Handler loop otomatis
+        let isProcessingOCR = false; // Flag status pengerjaan engine
 
         // ================= ROUTER ENGINE CONTROLLER =================
         window.navigateTo = async function(targetPage) {
-            // Matikan kamera jika pindah dari scanner
+            // MODIFIKASI: Matikan kamera & bersihkan interval jika pindah dari scanner
+            if (autoScanInterval) {
+                clearInterval(autoScanInterval);
+                autoScanInterval = null;
+            }
+
             if (activePage === 'ocr-scanner' && streamTrack) {
                 streamTrack.getTracks().forEach(track => track.stop());
                 document.getElementById('status-bar').innerText = "Kamera Off.";
@@ -314,6 +322,13 @@
             if (targetPage === 'ocr-scanner') {
                 await initCamera();
                 if(!ocrWorker) await initOCR();
+                
+                // MODIFIKASI: Aktifkan Loop Pemicu Otomatis Tiap 1.5 Detik Semenjak Halaman Terbuka
+                if (!autoScanInterval) {
+                    autoScanInterval = setInterval(() => {
+                        performOCRScanning();
+                    }, 1500);
+                }
             }
         };
 
@@ -392,7 +407,6 @@
             });
         };
 
-        // Modifikasi Format Menjadi CODE128 (Format Barcode Standar Linier Universal)
         window.openImagePopup = function(code) {
             const modal = document.getElementById('barcode-modal');
             const fallbackText = document.getElementById('barcode-text-fallback');
@@ -402,7 +416,6 @@
             
             setTimeout(() => {
                 try {
-                    // Mengubah format secara eksplisit menjadi CODE128 untuk menjamin gambar garis-garis barcode keluar sempurna
                     JsBarcode("#barcode-canvas", code, {
                         format: "CODE128",
                         width: 2,
@@ -509,32 +522,36 @@
             document.getElementById('status-bar').innerText = "Kamera & Engine OCR Siap.";
         }
 
+        // MODIFIKASI: Implementasi Algoritma Pemindaian Otomatis Non-Blocking (Tanpa Tekan Tombol)
         async function performOCRScanning() {
-            const snapBtn = document.getElementById('snapBtn');
-            const btnText = document.getElementById('btn-text');
+            // Mencegah interupsi eksekusi penumpukan thread jika proses sebelumnya belum rampung
+            if (isProcessingOCR || !ocrWorker || activePage !== 'ocr-scanner') return;
+            
             const statusBar = document.getElementById('status-bar');
             const canvas = document.getElementById('hidden-canvas');
             const video = document.getElementById('video');
 
-            snapBtn.disabled = true;
-            btnText.innerText = "DIGITALISASI CITRA...";
-            statusBar.innerText = "Memproses pemotongan matriks...";
+            // Cek kesiapan frame stream video dari driver kamera perangkat
+            if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
+
+            isProcessingOCR = true;
+            statusBar.innerText = "Radar mendeteksi objek citra...";
 
             const ctx = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Bounding Box Crop Area Matrix Calculations (70% Focus Grid Viewport Area)
-            const cropX = canvas.width * 0.10;
-            const cropY = canvas.height * 0.40;
-            const cropW = canvas.width * 0.80;
-            const cropH = canvas.height * 0.20;
+            // MODIFIKASI: Koreksi Matriks Koordinat Crop Menyesuaikan Bingkai Barcode Memanjang Pipih (W:[85%], H:14)
+            const cropX = canvas.width * 0.075; // Sesuai w-[85%] (Sisa 15% dibagi kiri-kanan)
+            const cropY = canvas.height * 0.42; // Menempatkan kotak pas di tengah-tengah vertikal
+            const cropW = canvas.width * 0.85;
+            const cropH = canvas.height * 0.16; // Lebih tipis/pipih pas mengikuti rasio barcode
 
             const croppedCanvas = document.createElement('canvas');
             croppedCanvas.width = cropW; croppedCanvas.height = cropH;
             const croppedCtx = croppedCanvas.getContext('2d');
-            croppedCtx.filter = "grayscale(100%) contrast(180%)";
+            croppedCtx.filter = "grayscale(100%) contrast(190%)"; // Filter penajaman garis barcode
             croppedCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
             try {
@@ -542,22 +559,19 @@
                 const cleanCode = text.replace(/[^0-9]/g, '');
 
                 if(cleanCode && cleanCode.length >= 4) {
-                    statusBar.innerText = `Mencari SKU: ${cleanCode}`;
+                    statusBar.innerText = `Menemukan SKU: ${cleanCode}`;
                     await lookupPriceDatabase(cleanCode);
                 } else {
-                    statusBar.innerText = "Angka tidak terdeteksi jelas. Pastikan cahaya terang.";
-                    showScannerCardUI(false, { code: cleanCode || "Tidak Terbaca" }, "PROSES GAGAL");
+                    statusBar.innerText = "Radar aktif mencari pola kode angka...";
                 }
             } catch (e) {
-                statusBar.innerText = "Error OCR: " + e.message;
+                console.error("Auto scan cycle skip/error:", e.message);
             } finally {
-                snapBtn.disabled = false;
-                btnText.innerText = "PINDAI KODE SEKARANG";
+                isProcessingOCR = false; // Buka kunci thread untuk perulangan selanjutnya
             }
         }
 
         async function lookupPriceDatabase(targetCode) {
-            // KEAMANAN UTAMA: Harga tidak di-hardcode, dicari terpisah per dokumen ke Firestore
             const docRef = doc(db, "products", targetCode);
             let statusLog = "Not Found", pName = "Unknown Product";
 
@@ -583,7 +597,6 @@
                 document.getElementById('status-bar').innerText = "Security Denied Rules.";
             }
 
-            // Simpan riwayat scan audit log
             await logScanHistory(targetCode, statusLog, pName);
         }
 
@@ -613,6 +626,10 @@
             } catch (e) { console.warn("Log Firestore Bypass (Offline/Security)"); }
 
             let logs = JSON.parse(localStorage.getItem('unified_scan_logs')) || [];
+            
+            // Mencegah penumpukan riwayat jika kode yang sama ter-scan berturut-turut oleh loop otomatis
+            if (logs.length > 0 && logs[0].code === code && logs[0].status === status) return;
+
             logs.unshift({ code, status, productName, time });
             if(logs.length > 20) logs.pop();
             localStorage.setItem('unified_scan_logs', JSON.stringify(logs));
@@ -640,9 +657,6 @@
                     <span class="font-bold ${l.status.includes('Success') ? 'text-green-400':'text-amber-500'}">${l.status}</span>
                 </div>`).join('');
         }
-
-        // Bind core click functions
-        document.getElementById('snapBtn').addEventListener('click', performOCRScanning);
 
         // Bootstrap load sequence
         window.addEventListener('DOMContentLoaded', () => {
