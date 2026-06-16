@@ -82,8 +82,8 @@
                         <select id="login-role" class="w-full p-3 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-industrial-primary">
                             <option value="Staff Gudang">Staff Gudang (Inbound/Outbound)</option>
                             <option value="Purchasing">Purchasing Officer</option>
-                            <option value="Supervisor">Supervisor Lapangan</option>
-                            <option value="Manajemen">Manajemen Direksi</option>
+                            <option value="Supervisor">Supervisor (Developer Menu Open)</option>
+                            <option value="Manajemen">Manajemen (Developer Menu Open)</option>
                         </select>
                     </div>
                     <button type="submit" class="w-full p-3 bg-industrial-primary hover:bg-blue-700 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-md transition active:scale-[0.99]">Masuk ke Sistem</button>
@@ -122,6 +122,106 @@
                 </div>
             </div>
 
+            <div id="developer-only-section" class="hidden grid grid-cols-1 lg:grid-cols-3 gap-6 pt-2">
+                <div class="space-y-6 lg:col-span-1">
+                    <div class="p-5 bg-white rounded-2xl border-2 border-dashed border-industrial-primary/40 shadow-enterprise space-y-4">
+                        <div class="flex items-center gap-2 border-b pb-3">
+                            <span class="text-lg">🛠️</span>
+                            <h4 id="form-title" class="text-xs font-black tracking-wide text-industrial-primary uppercase">Developer: Input Barcode SKU</h4>
+                        </div>
+                        <form id="product-form" class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase mb-1.5 text-industrial-slate tracking-wider">Kode Barang (Unique)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="prod-code" required class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs font-mono font-bold text-industrial-primary focus:outline-none">
+                                    <select id="digit-length" class="p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs font-bold focus:outline-none">
+                                        <option value="4">4D</option><option value="6">6D</option>
+                                        <option value="8" selected>8D</option><option value="10">10D</option><option value="12">12D</option>
+                                    </select>
+                                    <button type="button" onclick="triggerSingleGenerate()" class="px-3.5 bg-industrial-primary text-white rounded-xl text-xs font-bold">🎲</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase mb-1.5 text-industrial-slate tracking-wider">Nama Material</label>
+                                <input type="text" id="prod-name" required class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none">
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase mb-1.5 text-industrial-slate tracking-wider">Harga (Rp)</label>
+                                    <input type="number" id="prod-price" required class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase mb-1.5 text-industrial-slate tracking-wider">Kategori</label>
+                                    <input type="text" id="prod-category" required class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none" placeholder="Logam, Elektrikal...">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase mb-1.5 text-industrial-slate tracking-wider">Stok Lapangan</label>
+                                    <input type="text" id="prod-stock" required class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none" placeholder="100 Unit">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase mb-1.5 text-industrial-slate tracking-wider">Lokasi Rak</label>
+                                    <input type="text" id="prod-location" required class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none" placeholder="Gudang A / Rak 01">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase mb-1.5 text-industrial-slate tracking-wider">Nama Supplier / Vendor</label>
+                                <input type="text" id="prod-supplier" required class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none" placeholder="PT... ">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase mb-1.5 text-industrial-slate tracking-wider">Status Otorisasi</label>
+                                <select id="prod-status" class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none">
+                                    <option value="Tersedia">Tersedia (Bisa di-scan)</option>
+                                    <option value="Stok Menipis">Stok Menipis</option>
+                                    <option value="Habis">Habis (Dicekal)</option>
+                                </select>
+                            </div>
+                            <div class="flex gap-2 pt-2">
+                                <button type="submit" class="w-full p-3 bg-industrial-primary text-white rounded-xl text-xs font-black uppercase tracking-wider">Simpan SKU Cloud</button>
+                                <button type="button" onclick="resetForm()" class="px-4 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold">Clear</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="p-5 bg-white rounded-2xl border border-slate-200 shadow-enterprise space-y-3">
+                        <h4 class="text-sm font-black tracking-wide text-amber-500 uppercase mb-1">🚀 Developer: Batch Massal</h4>
+                        <div class="space-y-3">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="batch-qty" value="50" class="p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none" placeholder="Jumlah">
+                                <select id="batch-digits" class="p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs font-bold focus:outline-none">
+                                    <option value="6">6 Digit</option><option value="8" selected>8 Digit</option><option value="12">12 Digit</option>
+                                </select>
+                            </div>
+                            <button type="button" onclick="executeBatchGeneration()" class="w-full p-2.5 bg-amber-500 text-white rounded-xl text-[11px] font-black uppercase tracking-wider">Injeksi Kontainer Massal</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 p-5 bg-white rounded-2xl border border-slate-200 flex flex-col shadow-enterprise">
+                    <div class="flex flex-col sm:flex-row gap-3 justify-between items-center mb-5">
+                        <h4 class="text-sm font-black tracking-wide text-industrial-navy uppercase w-full">Developer: Manifes Basis Data ERP</h4>
+                        <div class="flex gap-2 w-full justify-end">
+                            <input type="text" id="search-input" oninput="liveSearchAndFilter()" placeholder="Cari SKU / nama..." class="p-2 w-full sm:w-48 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none">
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-inner">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead class="bg-slate-50 border-b border-slate-200 uppercase font-black tracking-wider text-slate-400">
+                                <tr>
+                                    <th class="p-3 text-[10px]">Kode SKU</th>
+                                    <th class="p-3 text-[10px]">Nama Produk</th>
+                                    <th class="p-3 text-[10px]">Harga</th>
+                                    <th class="p-3 text-[10px] text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-table-body" class="divide-y divide-slate-100">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
             <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-enterprise space-y-3">
                 <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                     <h4 class="text-xs font-black uppercase text-industrial-navy tracking-wider">Aktivitas Riwayat Scan Terbaru</h4>
@@ -136,9 +236,8 @@
                 <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
                 <div id="focus-area" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-16 border-2 border-industrial-primary rounded-xl shadow-[0_0_0_9999px_rgba(10,25,47,0.75)] pointer-events-none">
                     <div class="laser-line absolute left-0 right-0 h-[2px] bg-sky-400 shadow-[0_0_12px_#1565C0]"></div>
-                    <span class="absolute -bottom-5 left-0 right-0 text-center text-[8px] uppercase font-black text-industrial-primary tracking-widest">Posisikan Barcode di Sini</span>
+                    <span class="absolute -bottom-5 left-0 right-0 text-center text-[8px] uppercase font-black text-industrial-primary tracking-widest">Pindai Otomatis Barcode</span>
                 </div>
-                <button onclick="toggleFlashlight()" class="absolute bottom-3 right-3 bg-black/60 text-white p-2.5 rounded-full border border-white/20 text-xs backdrop-blur-sm active:scale-90 transition">🔦 Flash</button>
             </div>
             <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-enterprise flex justify-between items-center">
                 <div class="flex items-center gap-2">
@@ -196,7 +295,7 @@
         <section id="screen-history" class="hidden space-y-4 animate-fade-in">
             <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-enterprise space-y-3">
                 <div class="flex gap-2">
-                    <input type="text" id="history-search-input" oninput="renderHistoryScreenHTML()" placeholder="Pencarian cepat nama/kode..." class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-industrial-primary">
+                    <input type="text" id="history-search-input" oninput="renderHistoryScreenHTML()" placeholder="Pencarian cepat nama/kode..." class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none">
                     <select id="history-filter-category" onchange="renderHistoryScreenHTML()" class="p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs font-bold focus:outline-none">
                         <option value="all">Semua Kategori</option>
                         <option value="Logam">Logam</option>
@@ -205,7 +304,6 @@
                     </select>
                 </div>
             </div>
-
             <div class="bg-white rounded-2xl border border-slate-200 shadow-enterprise overflow-hidden">
                 <div id="full-history-list" class="divide-y divide-slate-100"></div>
             </div>
@@ -222,19 +320,7 @@
                     </div>
                 </div>
             </div>
-            
-            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-enterprise space-y-3">
-                <h4 class="text-xs font-black uppercase text-industrial-navy tracking-wider border-b pb-2">Konfigurasi Perangkat PWA</h4>
-                <div class="flex justify-between items-center text-xs py-1">
-                    <span class="font-medium text-industrial-slate">Vibrasi Sukses Scan</span>
-                    <input type="checkbox" checked class="w-4 h-4 accent-industrial-primary">
-                </div>
-                <div class="flex justify-between items-center text-xs py-1">
-                    <span class="font-medium text-industrial-slate">Auto Focus Kamera</span>
-                    <input type="checkbox" checked class="w-4 h-4 accent-industrial-primary">
-                </div>
-                <button onclick="triggerLogoutExecution()" class="w-full mt-2 p-2.5 bg-red-50 hover:bg-red-100 border border-red-200 text-industrial-error font-bold text-xs uppercase tracking-wider rounded-xl transition">Keluar Sesi / Log Out</button>
-            </div>
+            <button onclick="triggerLogoutExecution()" class="w-full mt-2 p-2.5 bg-red-50 hover:bg-red-100 border border-red-200 text-industrial-error font-bold text-xs uppercase tracking-wider rounded-xl transition">Keluar Sesi / Log Out</button>
         </section>
 
     </div>
@@ -255,9 +341,8 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // CONFIG UTAMA API FIREBASE ASLI (SUDAH DIPERBAIKI SINKRONISASINYA)
         const firebaseConfig = {
             apiKey: "AIzaSyCvli9t-p4rdfQb8IPYfQu7g2PeUuxqZ1Y",
             authDomain: "system-a35d6.firebaseapp.com",
@@ -271,12 +356,7 @@
         const db = getFirestore(app);
         const colRef = collection(db, "products");
 
-        let mockMaterialDatabase = {
-            "812529685326": { name: "Baja Konstruksi H-Beam 150", code: "812529685326", price: 2450000, category: "Logam", stock: "142 Batang", location: "Gudang A / Rak 04", supplier: "PT Krakatau Steel Tbk", status: "Tersedia" },
-            "20260617": { name: "Kabel Tembaga NYA 2.5mm", code: "20260617", price: 680000, category: "Elektrikal", stock: "85 Roll", location: "Gudang B / Rak 11", supplier: "PT Supreme Cable Tbk", status: "Stok Menipis" },
-            "00380189": { name: "Semen Portland Komposit 50kg", code: "00380189", price: 72000, category: "Semen", stock: "120 Sak", location: "Gudang C / Area Dalam", supplier: "PT Semen Indonesia Tbk", status: "Tersedia" }
-        };
-
+        let mockMaterialDatabase = [];
         let currentActiveSession = null;
         let scanHistoryLogs = [];
         let cameraStreamTrack = null;
@@ -284,6 +364,16 @@
         let liveRadarIntervalLoop = null;
         let isEngineProcessingThread = false;
         let activePageID = 'login';
+
+        // SINKRONISASI REAL-TIME CLOUD FIRESTORE UNTUK DEVELOPER DASHBOARD TABLE
+        onSnapshot(colRef, (snapshot) => {
+            mockMaterialDatabase = [];
+            snapshot.forEach((doc) => {
+                mockMaterialDatabase.push(doc.data());
+            });
+            document.getElementById('dash-total-sku').innerText = mockMaterialDatabase.length;
+            liveSearchAndFilter();
+        });
 
         // ================= ROUTER ROUTER ENGINE CONTROLLER =================
         window.navigateTo = async function(screenID) {
@@ -342,6 +432,14 @@
             document.getElementById('global-navbar').classList.remove('hidden');
             document.getElementById('global-bottom-nav').classList.remove('hidden');
 
+            // HAK AKSES DEVELOPER: Validasi apakah role yang masuk adalah Supervisor atau Manajemen
+            const devPanel = document.getElementById('developer-only-section');
+            if (role === 'Supervisor' || role === 'Manajemen') {
+                devPanel.classList.remove('hidden'); // Membuka kolom pembuat barcode
+            } else {
+                devPanel.classList.add('hidden'); // Menyembunyikan untuk Staff biasa
+            }
+
             navigateTo('dashboard');
         });
 
@@ -383,7 +481,6 @@
             if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
 
             isEngineProcessingThread = true;
-            statusBar.innerText = "Radar memindai matriks area kode...";
 
             const ctx = canvas.getContext('2d');
             canvas.width = video.videoWidth;
@@ -406,40 +503,126 @@
                 const cleanNumericCode = text.replace(/[^0-9]/g, '');
 
                 if (cleanNumericCode && cleanNumericCode.length >= 4) {
-                    statusBar.innerText = `Menemukan Manifes: ${cleanNumericCode}`;
                     if (navigator.vibrate) navigator.vibrate(100);
                     await executeMaterialDatabaseLookup(cleanNumericCode);
-                } else {
-                    statusBar.innerText = "Mencari target kode material...";
                 }
             } catch (e) {
-                console.warn("Loop interrupted:", e.message);
-            } finally {
+                console.warn(e.message);
+            } {
                 isEngineProcessingThread = false;
             }
         }
 
-        // ================= FIREBASE DATABASE INTEGRATION =================
+        // ================= BARCODE GENERATOR & CRUD FIRESTORE ENGINE =================
+        function generateNumericID(length) {
+            let result = '';
+            const characters = '0123456789';
+            for (let i = 0; i < length; i++) result += characters.charAt(Math.floor(Math.random() * characters.length));
+            return result;
+        }
+
+        window.triggerSingleGenerate = function() {
+            const digits = parseInt(document.getElementById('digit-length').value);
+            document.getElementById('prod-code').value = generateNumericID(digits);
+        };
+
+        window.liveSearchAndFilter = function() {
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            const tbody = document.getElementById('product-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = mockMaterialDatabase.filter(item => {
+                return item.code.includes(searchVal) || item.name.toLowerCase().includes(searchVal);
+            });
+
+            filtered.forEach(item => {
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 transition text-[11px] border-b border-slate-100">
+                        <td class="p-3 font-mono font-bold text-industrial-primary">${item.code}</td>
+                        <td class="p-3 font-bold">${item.name}</td>
+                        <td class="p-3 font-black text-industrial-success">Rp ${parseInt(item.price).toLocaleString('id-ID')}</td>
+                        <td class="p-3 text-center flex gap-1 justify-center">
+                            <button onclick="window.openImagePopup('${item.code}')" class="p-1 bg-slate-100 border rounded text-xs" title="Buka Gambar">🖼️</button>
+                            <button onclick="deleteProduct('${item.code}')" class="px-2 py-1 bg-industrial-error text-white rounded text-[10px] font-bold">Hapus</button>
+                        </td>
+                    </tr>`;
+            });
+        };
+
+        window.openImagePopup = function(code) {
+            const modal = document.getElementById('barcode-modal');
+            const fallbackText = document.getElementById('barcode-text-fallback');
+            modal.classList.remove('hidden');
+            fallbackText.innerText = code;
+            setTimeout(() => {
+                try {
+                    JsBarcode("#barcode-canvas", code, { format: "CODE128", width: 2, height: 65, displayValue: false, lineColor: "#0A192F" });
+                } catch (e) { fallbackText.innerText = `${code} (Gagal)`; }
+            }, 50);
+        };
+
+        window.closeBarcodeModal = function() {
+            document.getElementById('barcode-modal').classList.add('hidden');
+        };
+
+        document.getElementById('product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = document.getElementById('prod-code').value.trim();
+            const name = document.getElementById('prod-name').value.trim();
+            const price = parseInt(document.getElementById('prod-price').value);
+            const category = document.getElementById('prod-category').value.trim();
+            const stock = document.getElementById('prod-stock').value.trim();
+            const location = document.getElementById('prod-location').value.trim();
+            const supplier = document.getElementById('prod-supplier').value.trim();
+            const status = document.getElementById('prod-status').value;
+
+            try {
+                await setDoc(doc(db, "products", code), { code, name, price, category, stock, location, supplier, status });
+                alert('SKU Material berhasil diunggah ke Firebase Cloud.');
+                resetForm();
+            } catch (err) { alert('Firestore Error: ' + err.message); }
+        });
+
+        window.deleteProduct = async function(code) {
+            if (confirm(`Hapus material dengan kode ${code} dari cloud database?`)) {
+                await deleteDoc(doc(db, "products", code));
+            }
+        };
+
+        window.resetForm = function() {
+            document.getElementById('product-form').reset();
+        };
+
+        window.executeBatchGeneration = async function() {
+            const qty = parseInt(document.getElementById('batch-qty').value);
+            const digits = parseInt(document.getElementById('batch-digits').value);
+            if (qty <= 0 || qty > 100) return alert("Maksimal safety batch sekali injeksi adalah 100.");
+
+            const batch = writeBatch(db);
+            for(let i=0; i<qty; i++) {
+                let code = generateNumericID(digits);
+                batch.set(doc(db, "products", code), {
+                    code, name: `Automated Material ${code.substring(0,4)}`,
+                    price: Math.floor((Math.random() * 400 + 20)) * 1000,
+                    category: "Logam", stock: "100 Batang", location: "Gudang Cadangan", supplier: "Vendor PWA", status: "Tersedia"
+                });
+            }
+            await batch.commit();
+            alert(`Berhasil menginjeksi massal ${qty} SKU baru ke Firestore.`);
+        };
+
+        // ================= DATABASE ACTION INTERACTION LOGIC =================
         async function executeMaterialDatabaseLookup(code) {
-            let targetMaterial = mockMaterialDatabase[code];
+            let targetMaterial = mockMaterialDatabase.find(x => x.code === code);
 
             if (!targetMaterial) {
                 targetMaterial = {
-                    name: `Material SKU ID-${code}`,
-                    code: code,
-                    price: Math.floor((Math.random() * 500 + 50)) * 1000,
-                    category: "Logam",
-                    stock: "50 Unit (Auto PWA)",
-                    location: "Gudang Cadangan",
-                    supplier: "Mitra Industri Penyuplai",
-                    status: "Tersedia"
+                    name: `Material SKU ID-${code}`, code: code, price: 150000, category: "Logam", stock: "Bypass Lapangan", location: "Area Gudang", supplier: "Penyuplai Lokal", status: "Tersedia"
                 };
             }
 
             const logItem = {
-                ...targetMaterial,
-                timestamp: new Date().toLocaleString('id-ID'),
-                operator: currentActiveSession ? currentActiveSession.id : "WMS-2026-08"
+                ...targetMaterial, timestamp: new Date().toLocaleString('id-ID'), operator: currentActiveSession ? currentActiveSession.id : "WMS-2026-08"
             };
             scanHistoryLogs.unshift(logItem);
             showMaterialResultScreen(targetMaterial);
@@ -447,15 +630,12 @@
 
         window.triggerManualSearchPopup = function() {
             const inputManual = prompt("Masukkan Nomor Kode Numerik Material:");
-            if (inputManual) {
-                executeMaterialDatabaseLookup(inputManual.trim());
-            }
+            if (inputManual) { executeMaterialDatabaseLookup(inputManual.trim()); }
         };
 
-        // ================= RENDERING TEMPLATE VIEW CONTROL =================
+        // ================= VIEW DATA RENDERING ENGINE =================
         function showMaterialResultScreen(data) {
             navigateTo('result');
-            
             document.getElementById('res-category').innerText = data.category;
             document.getElementById('res-material-name').innerText = data.name;
             document.getElementById('res-material-code').innerText = `SKU MANIFES: ${data.code}`;
@@ -477,7 +657,7 @@
         }
 
         function renderDashboardScreenHTML() {
-            document.getElementById('dash-total-sku').innerText = Object.keys(mockMaterialDatabase).length;
+            document.getElementById('dash-total-sku').innerText = mockMaterialDatabase.length;
             document.getElementById('dash-scans-today').innerText = scanHistoryLogs.length;
 
             const recentContainer = document.getElementById('recent-logs-container');
@@ -497,7 +677,7 @@
                             <span class="text-industrial-navy font-bold block text-[11px]">${l.name}</span>
                         </div>
                         <div class="text-right">
-                            <span class="text-industrial-success font-black block">Rp ${l.price.toLocaleString('id-ID')}</span>
+                            <span class="text-industrial-success font-black block">Rp ${parseInt(l.price).toLocaleString('id-ID')}</span>
                             <span class="text-[9px] text-industrial-slate block">${l.timestamp}</span>
                         </div>
                     </div>`;
@@ -533,7 +713,7 @@
                             <span class="text-[9px] text-industrial-slate block mt-0.5">Operator: ${l.operator} • ${l.timestamp}</span>
                         </div>
                         <div class="text-right">
-                            <span class="text-sm font-black text-industrial-success font-mono">Rp ${l.price.toLocaleString('id-ID')}</span>
+                            <span class="text-sm font-black text-industrial-success font-mono">Rp ${parseInt(l.price).toLocaleString('id-ID')}</span>
                             <button onclick="window.showDetailsFromLog('${l.code}')" class="block text-[10px] text-industrial-primary font-bold uppercase tracking-wider mt-1 hover:underline">Detail ➔</button>
                         </div>
                     </div>`;
@@ -556,5 +736,18 @@
             navigateTo('login');
         });
     </script>
+    
+    <div id="barcode-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+        <div class="bg-white p-6 rounded-2xl max-w-sm w-full shadow-2xl flex flex-col items-center relative border border-slate-100">
+            <button onclick="window.closeBarcodeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 transition font-bold text-lg">✕</button>
+            <h3 class="text-industrial-primary font-black text-sm mb-4 tracking-wider uppercase">Linear Barcode</h3>
+            <div class="bg-slate-50 p-4 rounded-xl flex justify-center items-center w-full border border-slate-200">
+                <svg id="barcode-canvas"></svg>
+            </div>
+            <p id="barcode-text-fallback" class="mt-3 text-sm font-mono font-bold tracking-widest text-slate-700 bg-slate-100 px-4 py-1.5 rounded-lg"></p>
+        </div>
+    </div>
+    
+    <canvas id="hidden-canvas" class="hidden"></canvas>
 </body>
 </html>
