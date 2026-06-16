@@ -22,7 +22,6 @@
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-    <!-- JsBarcode CDN Engine Untuk Render Barcode seperti gambar code-93.webp -->
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
     <style>
         .laser-line { animation: scanAnimation 2s linear infinite; }
@@ -35,7 +34,6 @@
 </head>
 <body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-sans transition-colors duration-200 min-h-screen pb-12">
 
-    <!-- Modal Popup Untuk Menampilkan Barcode Visual dari code-93.webp -->
     <div id="barcode-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
         <div class="bg-white text-black p-6 rounded-2xl max-w-sm w-full shadow-2xl flex flex-col items-center relative border border-gray-200">
             <button onclick="window.closeBarcodeModal()" class="absolute top-3 right-4 text-gray-500 hover:text-black font-bold text-lg">✕</button>
@@ -261,7 +259,6 @@
 
     </div>
 
-    <!-- MAIN ENGINE MONOLITHIC SCRIPT -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
@@ -395,7 +392,7 @@
             });
         };
 
-        // Mengubah Logika Fungsi untuk Merender Barcode Linier seperti code-93.webp
+        // Mengubah Logika Fungsi untuk Memastikan Penemuan Elemen DOM Menggunakan Safe Jeda Waktu (Timeout)
         window.openImagePopup = function(code) {
             const modal = document.getElementById('barcode-modal');
             const fallbackText = document.getElementById('barcode-text-fallback');
@@ -403,21 +400,24 @@
             modal.classList.remove('hidden');
             fallbackText.innerText = code;
             
-            try {
-                // Konfigurasi JsBarcode agar menghasilkan styling hitam-putih presisi tinggi yang dapat discan oleh OCR
-                JsBarcode("#barcode-canvas", code, {
-                    format: "CODE93",
-                    width: 2,
-                    height: 75,
-                    displayValue: false,
-                    lineColor: "#000000",
-                    background: "#ffffff",
-                    margin: 10
-                });
-            } catch (error) {
-                console.error("Gagal memproses format linear barcode standard:", error);
-                fallbackText.innerText = `${code} (Format Gagal Render)`;
-            }
+            // Jeda 50ms memberikan kesempatan browser merender kontainer modal dan SVG ke layar
+            setTimeout(() => {
+                try {
+                    // Menggunakan format CODE128/Auto agar fleksibel membaca variasi panjang digit (4D, 6D, 8D, 12D) secara akurat
+                    JsBarcode("#barcode-canvas", code, {
+                        format: "auto",
+                        width: 2,
+                        height: 75,
+                        displayValue: false,
+                        lineColor: "#000000",
+                        background: "#ffffff",
+                        margin: 10
+                    });
+                } catch (error) {
+                    console.error("Gagal memproses format linear barcode standard:", error);
+                    fallbackText.innerText = `${code} (Format Gagal Render)`;
+                }
+            }, 50);
         };
 
         window.closeBarcodeModal = function() {
