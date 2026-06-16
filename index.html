@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="id" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Unified Price Code System & OCR Scanner</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#3B82F6">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2311/2311545.png">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { 
+            darkMode: 'class', 
+            theme: { 
+                extend: { 
+                    colors: { 
+                        brand: { "50": "#eff6ff", "100": "#dbeafe", "200": "#bfdbfe", "300": "#93c5fd", "400": "#60a5fa", "500": "#3b82f6", "600": "#2563eb", "700": "#1d4ed8", "800": "#1e40af", "900": "#1e3a8a" } 
+                    } 
+                } 
+            } 
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <style>
+        .laser-line { animation: scanAnimation 2s linear infinite; }
+        @keyframes scanAnimation { 
+            0% { top: 0%; opacity: 1; } 
+            50% { top: 100%; opacity: 1; } 
+            100% { top: 0%; opacity: 0.3; } 
+        }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-white font-sans transition-colors duration-200 min-h-screen pb-12">
+
+    <nav class="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3 fixed left-0 right-0 top-0 z-50 shadow-sm">
+        <div class="flex justify-between items-center max-w-7xl mx-auto">
+            <div class="flex items-center gap-2 cursor-pointer" onclick="navigateTo('role-selection')">
+                <span class="text-xl">🚀</span>
+                <span class="font-black text-sm md:text-base tracking-wider text-brand-500 uppercase">UNIFIED OCR SYSTEM</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span id="current-role-badge" class="hidden text-[10px] font-extrabold px-2.5 py-1 rounded bg-gray-100 dark:bg-gray-700 text-gray-400 uppercase"></span>
+                <button id="theme-toggle" class="text-gray-500 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-sm p-2">🌙</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="pt-20 px-4 max-w-7xl mx-auto">
+
+        <section id="page-role-selection" class="max-w-md mx-auto text-center space-y-6 py-12">
+            <div class="space-y-2">
+                <h2 class="text-3xl font-black text-brand-500">Pilih Hak Akses</h2>
+                <p class="text-sm text-gray-400">Silakan pilih dashboard kerja sesuai fungsi perangkat Anda saat ini.</p>
+            </div>
+            <div class="grid grid-cols-1 gap-4">
+                <button onclick="navigateTo('admin-dashboard')" class="p-6 bg-white dark:bg-gray-800 rounded-2xl border-2 border-transparent hover:border-brand-500 shadow-md text-left transition active:scale-95 group">
+                    <span class="text-3xl block mb-2">⚙️</span>
+                    <h3 class="font-bold text-lg group-hover:text-brand-400">PWA Admin & Generator</h3>
+                    <p class="text-xs text-gray-400 mt-1">Manajemen SKU produk, kontrol harga database, dan pembuatan kode numerik massal.</p>
+                </button>
+                <button onclick="navigateTo('ocr-scanner')" class="p-6 bg-white dark:bg-gray-800 rounded-2xl border-2 border-transparent hover:border-red-500 shadow-md text-left transition active:scale-95 group">
+                    <span class="text-3xl block mb-2">📷</span>
+                    <h3 class="font-bold text-lg group-hover:text-red-400">PWA OCR Price Scanner</h3>
+                    <p class="text-xs text-gray-400 mt-1">Akses kamera real-time untuk pemindaian kode angka di lapangan langsung tembus harga.</p>
+                </button>
+            </div>
+        </section>
+
+        <section id="page-admin-dashboard" class="hidden space-y-6">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Produk</p>
+                    <h3 id="dash-total-products" class="text-2xl font-black mt-1">0</h3>
+                </div>
+                <div class="p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Kode Aktif</p>
+                    <h3 id="dash-active-codes" class="text-2xl font-black mt-1 text-green-500">0</h3>
+                </div>
+                <div class="p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Scan</p>
+                    <h3 id="dash-total-scans" class="text-2xl font-black mt-1 text-blue-500">0</h3>
+                </div>
+                <div class="p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Expired</p>
+                    <h3 id="dash-expired-codes" class="text-2xl font-black mt-1 text-red-500">0</h3>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="space-y-6">
+                    <div class="p-5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <h4 id="form-title" class="text-base font-bold mb-4 text-brand-500 border-b dark:border-gray-700 pb-2">Tambah / Edit Produk</h4>
+                        <form id="product-form" class="space-y-3.5">
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase mb-1 text-gray-400">Kode Barang (Unique)</label>
+                                <div class="flex gap-2">
+                                    <input type="text" id="prod-code" required class="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs font-mono font-bold text-brand-400">
+                                    <select id="digit-length" class="p-2 bg-gray-100 dark:bg-gray-600 border border-gray-300 dark:border-gray-600 rounded-lg text-xs">
+                                        <option value="4">4D</option><option value="6">6D</option>
+                                        <option value="8" selected>8D</option><option value="10">10D</option><option value="12">12D</option>
+                                    </select>
+                                    <button type="button" onclick="triggerSingleGenerate()" class="px-3 bg-brand-500 hover:bg-brand-600 text-white rounded-lg text-xs">🎲</button>
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase mb-1 text-gray-400">Nama Produk</label>
+                                <input type="text" id="prod-name" required class="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase mb-1 text-gray-400">Harga (Rp)</label>
+                                    <input type="number" id="prod-price" required class="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase mb-1 text-gray-400">Kategori</label>
+                                    <input type="text" id="prod-category" required class="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs" placeholder="Makanan, Obat...">
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase mb-1 text-gray-400">Tgl Dibuat</label>
+                                    <input type="date" id="prod-created" required class="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs">
+                                </div>
+                                <div>
+                                    <label class="block text-[11px] font-bold uppercase mb-1 text-gray-400">Tgl Kadaluarsa</label>
+                                    <input type="date" id="prod-expired" required class="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-[11px] font-bold uppercase mb-1 text-gray-400">Status Otorisasi</label>
+                                <select id="prod-status" class="w-full p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs">
+                                    <option value="true">Aktif (Bisa di-scan)</option>
+                                    <option value="false">Nonaktif (Blokir scan)</option>
+                                </select>
+                            </div>
+                            <div class="flex gap-2 pt-2">
+                                <button type="submit" class="w-full p-2.5 bg-brand-600 hover:bg-brand-700 text-white rounded-lg text-xs font-bold uppercase">Simpan SKU</button>
+                                <button type="button" onclick="resetForm()" class="px-3 bg-gray-200 dark:bg-gray-600 rounded-lg text-xs">Clear</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="p-5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <h4 class="text-sm font-bold mb-1 text-amber-500">🚀 Batch Engine Massal</h4>
+                        <p class="text-[11px] text-gray-400 mb-3">Membuat ratusan kode unik langsung ke basis data cloud.</p>
+                        <div class="space-y-2">
+                            <div class="grid grid-cols-2 gap-2">
+                                <input type="number" id="batch-qty" value="50" class="p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs" placeholder="Jumlah">
+                                <select id="batch-digits" class="p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs">
+                                    <option value="6">6 Digit</option><option value="8" selected>8 Digit</option><option value="12">12 Digit</option>
+                                </select>
+                            </div>
+                            <button type="button" onclick="executeBatchGeneration()" class="w-full p-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-[11px] font-bold uppercase">Jalankan Batch Generation</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="lg:col-span-2 p-5 bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 flex flex-col shadow-sm">
+                    <div class="flex flex-col sm:flex-row gap-2 justify-between items-center mb-4">
+                        <h4 class="text-base font-bold text-gray-700 dark:text-gray-200 w-full">Data Master Inventaris</h4>
+                        <div class="flex gap-2 w-full justify-end">
+                            <input type="text" id="search-input" oninput="liveSearchAndFilter()" placeholder="Cari SKU / nama..." class="p-2 w-full sm:w-48 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs">
+                            <select id="filter-status" onchange="liveSearchAndFilter()" class="p-2 bg-gray-50 dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg text-xs">
+                                <option value="all">Semua</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                        <table class="w-full text-left text-xs">
+                            <thead class="bg-gray-100 dark:bg-gray-700 uppercase font-bold text-gray-500 dark:text-gray-400">
+                                <tr>
+                                    <th class="p-3">Kode SKU</th><th class="p-3">Nama Produk</th>
+                                    <th class="p-3">Harga</th><th class="p-3">Status</th>
+                                    <th class="p-3 text-center">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody id="product-table-body" class="divide-y divide-gray-200 dark:divide-gray-700">
+                                </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="page-ocr-scanner" class="hidden max-w-md mx-auto space-y-4">
+            <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border-2 border-gray-700 shadow-2xl">
+                <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
+                <div id="focus-area" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-4/5 h-16 border-2 border-red-500 rounded-lg shadow-[0_0_0_9999px_rgba(0,0,0,0.65)] pointer-events-none">
+                    <div class="laser-line absolute left-0 right-0 h-[2px] bg-red-400 shadow-[0_0_8px_#ef4444]"></div>
+                    <span class="absolute -bottom-5 left-0 right-0 text-center text-[9px] uppercase font-bold text-red-400 tracking-widest">Posisikan Kode Angka di Sini</span>
+                </div>
+            </div>
+
+            <button id="snapBtn" class="w-full p-4 bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl shadow-lg flex justify-center items-center gap-2 transition active:scale-95">
+                <span>📸</span> <span id="btn-text">PINDAI KODE SEKARANG</span>
+            </button>
+            <canvas id="hidden-canvas" class="hidden"></canvas>
+
+            <div id="result-card" class="bg-gray-800 border border-gray-700 rounded-2xl p-5 shadow-2xl hidden animate-fade-in">
+                <div class="flex items-center justify-between border-b border-gray-700 pb-2.5 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span id="res-badge-icon" class="text-lg"></span>
+                        <div>
+                            <h4 id="res-status-title" class="text-xs font-black tracking-wide uppercase"></h4>
+                            <p id="res-code-scanned" class="text-[11px] font-mono text-gray-400"></p>
+                        </div>
+                    </div>
+                    <button onclick="closeResultCard()" class="text-gray-400 hover:text-white text-xs">✕</button>
+                </div>
+                <div class="space-y-2">
+                    <div class="flex justify-between items-baseline bg-gray-900/60 p-3 rounded-lg">
+                        <span class="text-xs text-gray-400">Harga Real-time</span>
+                        <span id="res-price" class="text-2xl font-black text-emerald-400">Rp 0</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2 text-[11px]">
+                        <div class="bg-gray-900/30 p-2 rounded">
+                            <span class="text-gray-500 block text-[9px] uppercase">Nama Barang</span>
+                            <span id="res-name" class="font-bold text-gray-200">-</span>
+                        </div>
+                        <div class="bg-gray-900/30 p-2 rounded">
+                            <span class="text-gray-500 block text-[9px] uppercase">Status SKU</span>
+                            <span id="res-status" class="font-bold">-</span>
+                        </div>
+                        <div class="bg-gray-900/30 p-2 rounded">
+                            <span class="text-gray-500 block text-[9px] uppercase">Tgl Dibuat</span>
+                            <span id="res-created" class="text-gray-300"></span>
+                        </div>
+                        <div class="bg-gray-900/30 p-2 rounded">
+                            <span class="text-gray-500 block text-[9px] uppercase">Kadaluarsa</span>
+                            <span id="res-expired" class="text-gray-300"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="status-bar" class="text-center text-xs text-gray-400 font-medium italic">Kamera Off.</div>
+
+            <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4 space-y-2">
+                <div class="flex justify-between items-center border-b border-gray-700 pb-1.5">
+                    <h3 class="text-[10px] font-bold uppercase text-gray-400 tracking-wider">Log Riwayat Scan</h3>
+                    <button onclick="clearScanLogs()" class="text-[9px] text-red-400 hover:underline">Clear</button>
+                </div>
+                <div id="history-container" class="space-y-1.5 max-h-36 overflow-y-auto divide-y divide-gray-700/50"></div>
+            </div>
+        </section>
+
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+        // 1. REAL PRODUCTION FIREBASE CONFIGURATION
+        const firebaseConfig = {
+            apiKey: "AIzaSyAsFakeKey_YOUR_ACTUAL_API_KEY",
+            authDomain: "ocr-price-system.firebaseapp.com",
+            projectId: "ocr-price-system",
+            storageBucket: "ocr-price-system.appspot.com",
+            messagingSenderId: "1234567890",
+            appId: "1:1234567890:web:abcdef123456"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const colRef = collection(db, "products");
+        const historyRef = collection(db, "scan_history");
+
+        // STATE MANAGER GLOBAL
+        let localCachedProducts = [];
+        let ocrWorker = null;
+        let streamTrack = null;
+        let activePage = 'role-selection';
+
+        // ================= ROUTER ENGINE CONTROLLER =================
+        window.navigateTo = async function(targetPage) {
+            // Matikan kamera jika pindah dari scanner
+            if (activePage === 'ocr-scanner' && streamTrack) {
+                streamTrack.getTracks().forEach(track => track.stop());
+                document.getElementById('status-bar').innerText = "Kamera Off.";
+            }
+
+            // Hide all pages
+            document.getElementById('page-role-selection').classList.add('hidden');
+            document.getElementById('page-admin-dashboard').classList.add('hidden');
+            document.getElementById('page-ocr-scanner').classList.add('hidden');
+
+            // Show target page
+            document.getElementById(`page-${targetPage}`).classList.remove('hidden');
+            activePage = targetPage;
+
+            // Role Badge Config
+            const badge = document.getElementById('current-role-badge');
+            if(targetPage === 'role-selection') {
+                badge.classList.add('hidden');
+            } else {
+                badge.classList.remove('hidden');
+                badge.innerText = targetPage === 'admin-dashboard' ? "🔑 Admin Mode" : "📡 Scanner Mode";
+            }
+
+            // Action per page initialization
+            if (targetPage === 'ocr-scanner') {
+                await initCamera();
+                if(!ocrWorker) await initOCR();
+            }
+        };
+
+        // ================= LOGIK THEME CONFIG =================
+        document.getElementById('theme-toggle').addEventListener('click', () => {
+            document.documentElement.classList.toggle('dark');
+        });
+
+        // ================= MODULE 1: LOGIK ENGINE ADMIN =================
+        function generateNumericID(length) {
+            let result = '';
+            const characters = '0123456789';
+            for (let i = 0; i < length; i++) result += characters.charAt(Math.floor(Math.random() * characters.length));
+            return result;
+        }
+
+        window.triggerSingleGenerate = function() {
+            const digits = parseInt(document.getElementById('digit-length').value);
+            document.getElementById('prod-code').value = generateNumericID(digits);
+        };
+
+        // Sinkronisasi Real-time Firestore untuk Dashboard & CRUD Table
+        onSnapshot(colRef, (snapshot) => {
+            localCachedProducts = [];
+            let totalActive = 0, totalExpired = 0;
+            const rightNow = new Date().toISOString().split('T')[0];
+
+            snapshot.forEach((doc) => {
+                const data = doc.data();
+                localCachedProducts.push(data);
+                if (data.status === true || data.status === "true") totalActive++;
+                if (data.expired_at && data.expired_at < rightNow) totalExpired++;
+            });
+
+            document.getElementById('dash-total-products').innerText = localCachedProducts.length;
+            document.getElementById('dash-active-codes').innerText = totalActive;
+            document.getElementById('dash-expired-codes').innerText = totalExpired;
+            liveSearchAndFilter();
+        });
+
+        onSnapshot(historyRef, (snapshot) => {
+            document.getElementById('dash-total-scans').innerText = snapshot.size;
+        });
+
+        window.liveSearchAndFilter = function() {
+            const searchVal = document.getElementById('search-input').value.toLowerCase();
+            const filterStatus = document.getElementById('filter-status').value;
+            const tbody = document.getElementById('product-table-body');
+            tbody.innerHTML = '';
+
+            const filtered = localCachedProducts.filter(item => {
+                const matchesSearch = item.code.includes(searchVal) || item.product_name.toLowerCase().includes(searchVal);
+                const matchesStatus = filterStatus === 'all' || 
+                    (filterStatus === 'active' && (item.status === true || item.status === "true")) ||
+                    (filterStatus === 'inactive' && (item.status === false || item.status === "false"));
+                return matchesSearch && matchesStatus;
+            });
+
+            filtered.forEach(item => {
+                const isTrueActive = item.status === true || item.status === "true";
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-100 dark:hover:bg-gray-700 bg-white dark:bg-gray-800 transition text-[11px]">
+                        <td class="p-2.5 font-mono font-bold text-brand-500">${item.code}</td>
+                        <td class="p-2.5 font-medium">${item.product_name}</td>
+                        <td class="p-2.5 font-bold text-emerald-500">Rp ${parseInt(item.price).toLocaleString('id-ID')}</td>
+                        <td class="p-2.5">
+                            <span class="px-2 py-0.5 rounded text-[9px] font-bold ${isTrueActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300':'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}">${isTrueActive ? 'AKTIF':'BLOK'}</span>
+                        </td>
+                        <td class="p-2.5 text-center flex gap-1 justify-center">
+                            <button onclick="editProduct('${item.code}')" class="px-1.5 py-0.5 bg-blue-500 text-white rounded text-[10px]">Edit</button>
+                            <button onclick="deleteProduct('${item.code}')" class="px-1.5 py-0.5 bg-red-600 text-white rounded text-[10px]">Hapus</button>
+                        </td>
+                    </tr>`;
+            });
+        };
+
+        document.getElementById('product-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const code = document.getElementById('prod-code').value.trim();
+            const name = document.getElementById('prod-name').value.trim();
+            const price = parseInt(document.getElementById('prod-price').value);
+            const category = document.getElementById('prod-category').value.trim();
+            const created = document.getElementById('prod-created').value;
+            const expired = document.getElementById('prod-expired').value;
+            const status = document.getElementById('prod-status').value === "true";
+
+            try {
+                await setDoc(doc(db, "products", code), { code, product_name: name, price, category, status, created_at: created, expired_at: expired });
+                alert('Data SKU disimpan.');
+                resetForm();
+            } catch (err) { alert('Firestore Error: ' + err.message); }
+        });
+
+        window.editProduct = function(code) {
+            const item = localCachedProducts.find(p => p.code === code);
+            if (!item) return;
+            document.getElementById('prod-code').value = item.code;
+            document.getElementById('prod-name').value = item.product_name;
+            document.getElementById('prod-price').value = item.price;
+            document.getElementById('prod-category').value = item.category || '';
+            document.getElementById('prod-created').value = item.created_at || '';
+            document.getElementById('prod-expired').value = item.expired_at || '';
+            document.getElementById('prod-status').value = item.status.toString();
+            document.getElementById('form-title').innerText = "Edit Mode Aktif";
+        };
+
+        window.deleteProduct = async function(code) {
+            if(confirm(`Hapus ${code}?`)) await deleteDoc(doc(db, "products", code));
+        };
+
+        window.resetForm = function() {
+            document.getElementById('product-form').reset();
+            document.getElementById('form-title').innerText = "Tambah / Edit Produk";
+        };
+
+        // Batch Generator Engine (Batas Penulisan Transaksi Maksimal 500 SKU)
+        window.executeBatchGeneration = async function() {
+            const qty = parseInt(document.getElementById('batch-qty').value);
+            const digits = parseInt(document.getElementById('batch-digits').value);
+            if (qty <= 0 || qty > 200) return alert("Batas maksimal safety batch adalah 200 item.");
+
+            const batch = writeBatch(db);
+            const t = new Date().toISOString().split('T')[0];
+
+            for(let i=0; i<qty; i++) {
+                let code = generateNumericID(digits);
+                batch.set(doc(db, "products", code), {
+                    code, product_name: `Automated ${code.substring(0,3)}`,
+                    price: Math.floor((Math.random() * 200 + 10)) * 1000,
+                    category: "Batch Gen", status: true, created_at: t, expired_at: t
+                });
+            }
+            await batch.commit();
+            alert(`Berhasil menginjeksi ${qty} SKU ke cloud Firestore.`);
+        };
+
+
+        // ================= MODULE 2: LOGIK ENGINE OCR SCANNER =================
+        async function initCamera() {
+            const video = document.getElementById('video');
+            try {
+                streamTrack = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
+                });
+                video.srcObject = streamTrack;
+                document.getElementById('status-bar').innerText = "Kamera Aktif.";
+            } catch (err) {
+                document.getElementById('status-bar').innerText = "Gagal Kamera: " + err.message;
+            }
+        }
+
+        async function initOCR() {
+            document.getElementById('status-bar').innerText = "Memuat Tesseract Engine...";
+            ocrWorker = await Tesseract.createWorker('eng');
+            await ocrWorker.setParameters({ tessedit_char_whitelist: '0123456789' });
+            document.getElementById('status-bar').innerText = "Kamera & Engine OCR Siap.";
+        }
+
+        async function performOCRScanning() {
+            const snapBtn = document.getElementById('snapBtn');
+            const btnText = document.getElementById('btn-text');
+            const statusBar = document.getElementById('status-bar');
+            const canvas = document.getElementById('hidden-canvas');
+            const video = document.getElementById('video');
+
+            snapBtn.disabled = true;
+            btnText.innerText = "DIGITALISASI CITRA...";
+            statusBar.innerText = "Memproses pemotongan matriks...";
+
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Bounding Box Crop Area Matrix Calculations (70% Focus Grid Viewport Area)
+            const cropX = canvas.width * 0.10;
+            const cropY = canvas.height * 0.40;
+            const cropW = canvas.width * 0.80;
+            const cropH = canvas.height * 0.20;
+
+            const croppedCanvas = document.createElement('canvas');
+            croppedCanvas.width = cropW; croppedCanvas.height = cropH;
+            const croppedCtx = croppedCanvas.getContext('2d');
+            croppedCtx.filter = "grayscale(100%) contrast(180%)";
+            croppedCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
+
+            try {
+                const { data: { text } } = await ocrWorker.recognize(croppedCanvas);
+                const cleanCode = text.replace(/[^0-9]/g, '');
+
+                if(cleanCode && cleanCode.length >= 4) {
+                    statusBar.innerText = `Mencari SKU: ${cleanCode}`;
+                    await lookupPriceDatabase(cleanCode);
+                } else {
+                    statusBar.innerText = "Angka tidak terdeteksi jelas. Pastikan cahaya terang.";
+                    showScannerCardUI(false, { code: cleanCode || "Tidak Terbaca" }, "PROSES GAGAL");
+                }
+            } catch (e) {
+                statusBar.innerText = "Error OCR: " + e.message;
+            } finally {
+                snapBtn.disabled = false;
+                btnText.innerText = "PINDAI KODE SEKARANG";
+            }
+        }
+
+        async function lookupPriceDatabase(targetCode) {
+            // KEAMANAN UTAMA: Harga tidak di-hardcode, dicari terpisah per dokumen ke Firestore
+            const docRef = doc(db, "products", targetCode);
+            let statusLog = "Not Found", pName = "Unknown Product";
+
+            try {
+                const snap = await getDoc(docRef);
+                if(snap.exists()) {
+                    const prod = snap.data();
+                    pName = prod.product_name;
+                    const rightNow = new Date().toISOString().split('T')[0];
+                    const isExpired = prod.expired_at && prod.expired_at < rightNow;
+
+                    if(prod.status === false || prod.status === "false" || isExpired) {
+                        statusLog = "Terdeteksi (Dicekal)";
+                        showScannerCardUI(false, prod, "PRODUK NONAKTIF / KADALUARSA");
+                    } else {
+                        statusLog = "Success Found";
+                        showScannerCardUI(true, prod, "PRODUK DITEMUKAN");
+                    }
+                } else {
+                    showScannerCardUI(false, { code: targetCode, product_name: "SKU Belum Terdaftar", price: 0 }, "KODE TIDAK ADA");
+                }
+            } catch(err) {
+                document.getElementById('status-bar').innerText = "Security Denied Rules.";
+            }
+
+            // Simpan riwayat scan audit log
+            await logScanHistory(targetCode, statusLog, pName);
+        }
+
+        function showScannerCardUI(isSuccess, data, title) {
+            const card = document.getElementById('result-card');
+            card.classList.remove('hidden');
+
+            document.getElementById('res-status-title').innerText = title;
+            document.getElementById('res-status-title').className = isSuccess ? "text-xs font-black text-emerald-400":"text-xs font-black text-amber-500";
+            document.getElementById('res-badge-icon').innerText = isSuccess ? "✅" : "⚠️";
+            document.getElementById('res-code-scanned').innerText = `SKU ID: ${data.code}`;
+            document.getElementById('res-name').innerText = data.product_name || "-";
+            document.getElementById('res-price').innerText = data.price ? `Rp ${parseInt(data.price).toLocaleString('id-ID')}` : "Rp 0";
+            document.getElementById('res-created').innerText = data.created_at || "-";
+            document.getElementById('res-expired').innerText = data.expired_at || "-";
+            document.getElementById('res-status').innerText = data.status ? "AKTIF" : "NONAKTIF";
+        }
+
+        window.closeResultCard = function() {
+            document.getElementById('result-card').classList.add('hidden');
+        };
+
+        async function logScanHistory(code, status, productName) {
+            const time = new Date().toLocaleString('id-ID');
+            try {
+                await addDoc(collection(db, "scan_history"), { code, product_name: productName, scanned_at: time, result_status: status });
+            } catch (e) { console.warn("Log Firestore Bypass (Offline/Security)"); }
+
+            let logs = JSON.parse(localStorage.getItem('unified_scan_logs')) || [];
+            logs.unshift({ code, status, productName, time });
+            if(logs.length > 20) logs.pop();
+            localStorage.setItem('unified_scan_logs', JSON.stringify(logs));
+            renderLocalLogsHTML();
+        }
+
+        window.clearScanLogs = function() {
+            localStorage.removeItem('unified_scan_logs');
+            renderLocalLogsHTML();
+        };
+
+        function renderLocalLogsHTML() {
+            const container = document.getElementById('history-container');
+            let logs = JSON.parse(localStorage.getItem('unified_scan_logs')) || [];
+            if(logs.length === 0) {
+                container.innerHTML = `<p class="text-center text-[10px] text-gray-500 py-3">Belum ada riwayat.</p>`;
+                return;
+            }
+            container.innerHTML = logs.map(l => `
+                <div class="flex justify-between items-center py-1.5 text-[10px] font-mono">
+                    <div>
+                        <span class="text-amber-400 font-bold">${l.code}</span> - <span class="text-gray-300">${l.productName}</span>
+                        <span class="block text-[8px] text-gray-500">${l.time}</span>
+                    </div>
+                    <span class="font-bold ${l.status.includes('Success') ? 'text-green-400':'text-amber-500'}">${l.status}</span>
+                </div>`).join('');
+        }
+
+        // Bind core click functions
+        document.getElementById('snapBtn').addEventListener('click', performOCRScanning);
+
+        // Bootstrap load sequence
+        window.addEventListener('DOMContentLoaded', () => {
+            renderLocalLogsHTML();
+            navigateTo('role-selection');
+        });
+
+        // Register Tunggal Service Worker PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(err => console.error("SW Registration Error", err));
+        }
+    </script>
+</body>
+</html>
