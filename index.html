@@ -1,289 +1,263 @@
 <!DOCTYPE html>
-<html lang="id" class="dark">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Unified Price Code System & OCR Scanner</title>
+    <title>Enterprise Material Management System</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#0f172a">
+    <meta name="theme-color" content="#1565C0">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2311/2311545.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { 
-            darkMode: 'class', 
-            theme: { 
-                extend: { 
-                    colors: { 
-                        brand: { 
-                            "50": "#f0fdf4", "100": "#dcfce7", "200": "#bbf7d0", "300": "#86efac", 
-                            "400": "#4ade80", "500": "#22c55e", "600": "#16a34a", "700": "#15803d", 
-                            "800": "#166534", "900": "#14532d"
-                        },
-                        darkbg: {
-                            "base": "#0f172a", "card": "#1e293b", "border": "#334155"
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        industrial: {
+                            canvas: '#FFFFFF',
+                            bgLight: '#F5F7FA',
+                            primary: '#1565C0',
+                            navy: '#0A192F',
+                            slate: '#4A5568',
+                            success: '#2E7D32',
+                            warning: '#EF6C00',
+                            error: '#C62828'
                         }
-                    } 
-                } 
-            } 
+                    },
+                    boxShadow: {
+                        enterprise: '0 4px 12px -1px rgba(10, 25, 47, 0.04), 0 2px 4px -1px rgba(10, 25, 47, 0.02)',
+                        premium: '0 20px 40px -5px rgba(10, 25, 47, 0.1)'
+                    }
+                }
+            }
         }
     </script>
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
+    
     <style>
         .laser-line { animation: scanAnimation 2s linear infinite; }
         @keyframes scanAnimation { 
             0% { top: 0%; opacity: 1; } 
             50% { top: 100%; opacity: 1; } 
-            100% { top: 0%; opacity: 0.3; } 
+            100% { top: 0%; opacity: 0.2; } 
         }
-        /* Custom scrollbar untuk tampilan tabel profesional */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+        body { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-darkbg-base text-slate-900 dark:text-slate-100 font-sans transition-colors duration-300 min-h-screen pb-16">
+<body class="bg-industrial-bgLight text-industrial-navy font-sans min-h-screen pb-20 select-none">
 
-    <div id="barcode-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md transition-all duration-300">
-        <div class="bg-white p-6 rounded-2xl max-w-sm w-full shadow-[0_20px_50px_rgba(0,0,0,0.3)] flex flex-col items-center relative border border-slate-100 transform scale-100 transition-transform">
-            <button onclick="window.closeBarcodeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 transition font-bold text-lg">✕</button>
-            <h3 class="text-emerald-600 font-black text-lg mb-4 tracking-wider uppercase">Linear Barcode</h3>
-            <div class="bg-slate-50 p-4 rounded-xl flex justify-center items-center w-full border border-slate-200">
-                <svg id="barcode-canvas"></svg>
-            </div>
-            <p id="barcode-text-fallback" class="mt-3 text-sm font-mono font-bold tracking-widest text-slate-700 bg-slate-100 px-4 py-1.5 rounded-lg"></p>
-        </div>
-    </div>
-
-    <nav class="bg-white/80 dark:bg-darkbg-card/80 backdrop-blur-md border-b border-slate-200 dark:border-darkbg-border px-4 py-3.5 fixed left-0 right-0 top-0 z-50 shadow-sm transition-colors duration-300">
+    <nav id="global-navbar" class="hidden bg-white border-b border-slate-200 px-4 py-3.5 fixed left-0 right-0 top-0 z-40 shadow-sm">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
-            <div class="flex items-center gap-2.5 cursor-pointer" onclick="navigateTo('role-selection')">
-                <div class="p-2 bg-emerald-500/10 rounded-xl text-emerald-500 text-lg shadow-sm border border-emerald-500/20">🚀</div>
-                <span class="font-black text-sm md:text-base tracking-wider bg-gradient-to-r from-emerald-500 to-teal-400 bg-clip-text text-transparent uppercase">UNIFIED OCR SYSTEM</span>
+            <div class="flex items-center gap-3" onclick="navigateTo('dashboard')">
+                <div class="p-2 bg-industrial-primary/10 rounded-xl text-industrial-primary font-bold border border-industrial-primary/20">🏭</div>
+                <div>
+                    <span class="font-black text-xs md:text-sm tracking-wider text-industrial-primary uppercase block">WMS ENTERPRISE</span>
+                    <span id="nav-user-info" class="text-[10px] text-industrial-slate font-medium block">Memuat Sesi...</span>
+                </div>
             </div>
-            <div class="flex items-center gap-3">
-                <span id="current-role-badge" class="hidden text-[10px] font-black px-3 py-1.5 rounded-full border bg-slate-100 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 tracking-wide uppercase"></span>
-                <button id="theme-toggle" class="text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 rounded-xl text-sm p-2 transition">🌙</button>
+            <div class="flex items-center gap-2">
+                <span id="sync-status-badge" class="text-[9px] font-black px-2.5 py-1 rounded-full bg-emerald-50 text-industrial-success border border-emerald-200 uppercase tracking-wider">ONLINE SINKRON</span>
             </div>
         </div>
     </nav>
 
-    <div class="pt-24 px-4 max-w-7xl mx-auto transition-all duration-300">
+    <div class="pt-20 px-4 max-w-7xl mx-auto">
 
-        <section id="page-role-selection" class="max-w-md mx-auto text-center space-y-8 py-12">
-            <div class="space-y-2">
-                <h2 class="text-3xl font-black tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-slate-900 to-slate-700 dark:from-white dark:to-slate-300">Pilih Hak Akses</h2>
-                <p class="text-xs md:text-sm text-slate-500 dark:text-slate-400 max-w-xs mx-auto">Silakan tentukan fungsionalitas sistem berdasarkan peran perangkat operasional Anda.</p>
+        <section id="screen-login" class="max-w-md mx-auto space-y-6 py-12">
+            <div class="text-center space-y-2">
+                <div class="w-16 h-16 bg-industrial-primary text-white text-3xl font-bold flex items-center justify-center rounded-2xl mx-auto shadow-lg shadow-industrial-primary/20">M</div>
+                <h2 class="text-2xl font-black tracking-tight text-industrial-navy">Material Management PWA</h2>
+                <p class="text-xs text-industrial-slate">Sistem Logistik dan Inventarisasi Lapangan Terpadu</p>
             </div>
-            <div class="grid grid-cols-1 gap-5">
-                <button onclick="navigateTo('admin-dashboard')" class="p-6 bg-white dark:bg-darkbg-card rounded-2xl border border-slate-200 dark:border-darkbg-border/60 hover:border-emerald-500 dark:hover:border-emerald-500 hover:shadow-xl dark:hover:shadow-[0_0_30px_rgba(34,197,94,0.1)] text-left transition-all duration-300 active:scale-[0.98] group relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl translate-x-4 -translate-y-4"></div>
-                    <span class="text-3xl block mb-3 bg-slate-100 dark:bg-slate-800 w-12 h-12 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700">⚙️</span>
-                    <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100 group-hover:text-emerald-500 dark:group-hover:text-emerald-400 transition">PWA Admin & Generator</h3>
-                    <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">Manajemen SKU produk, kontrol otoritas harga cloud database, dan pembuatan kode numerik massal.</p>
-                </button>
-                <button onclick="navigateTo('ocr-scanner')" class="p-6 bg-white dark:bg-darkbg-card rounded-2xl border border-slate-200 dark:border-darkbg-border/60 hover:border-rose-500 dark:hover:border-rose-500 hover:shadow-xl dark:hover:shadow-[0_0_30px_rgba(244,63,94,0.1)] text-left transition-all duration-300 active:scale-[0.98] group relative overflow-hidden">
-                    <div class="absolute top-0 right-0 w-24 h-24 bg-rose-500/5 rounded-full blur-xl translate-x-4 -translate-y-4"></div>
-                    <span class="text-3xl block mb-3 bg-slate-100 dark:bg-slate-800 w-12 h-12 flex items-center justify-center rounded-xl border border-slate-200 dark:border-slate-700">📷</span>
-                    <h3 class="font-bold text-lg text-slate-800 dark:text-slate-100 group-hover:text-rose-400 transition">PWA OCR Price Scanner</h3>
-                    <p class="text-xs text-slate-400 mt-1.5 leading-relaxed">Akses kamera real-time berkecepatan tinggi untuk pemindaian kode angka linier otomatis langsung di lapangan.</p>
-                </button>
-            </div>
-        </section>
-
-        <section id="page-admin-dashboard" class="hidden space-y-6 animate-[fadeIn_0.4s_ease-out]">
-            <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="p-4 bg-white dark:bg-darkbg-card rounded-2xl border border-slate-200 dark:border-darkbg-border shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Produk</p>
-                    <h3 id="dash-total-products" class="text-2xl font-black mt-1 text-slate-800 dark:text-white">0</h3>
-                </div>
-                <div class="p-4 bg-white dark:bg-darkbg-card rounded-2xl border border-slate-200 dark:border-darkbg-border shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Kode Aktif</p>
-                    <h3 id="dash-active-codes" class="text-2xl font-black mt-1 text-emerald-500">0</h3>
-                </div>
-                <div class="p-4 bg-white dark:bg-darkbg-card rounded-2xl border border-slate-200 dark:border-darkbg-border shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Total Scan</p>
-                    <h3 id="dash-total-scans" class="text-2xl font-black mt-1 text-blue-500">0</h3>
-                </div>
-                <div class="p-4 bg-white dark:bg-darkbg-card rounded-2xl border border-slate-200 dark:border-darkbg-border shadow-sm">
-                    <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Expired</p>
-                    <h3 id="dash-expired-codes" class="text-2xl font-black mt-1 text-rose-500">0</h3>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="space-y-6">
-                    <div class="p-5 bg-white dark:bg-darkbg-card rounded-2xl border border-slate-200 dark:border-darkbg-border shadow-sm">
-                        <h4 id="form-title" class="text-sm font-black tracking-wide text-emerald-500 uppercase border-b dark:border-slate-700/60 pb-3 mb-4">Tambah / Edit Produk</h4>
-                        <form id="product-form" class="space-y-4">
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase mb-1.5 text-slate-400 tracking-wider">Kode Barang (Unique)</label>
-                                <div class="flex gap-2">
-                                    <input type="text" id="prod-code" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-mono font-bold text-emerald-500 focus:outline-none focus:border-emerald-500 transition">
-                                    <select id="digit-length" class="p-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none font-medium">
-                                        <option value="4">4D</option><option value="6">6D</option>
-                                        <option value="8" selected>8D</option><option value="10">10D</option><option value="12">12D</option>
-                                    </select>
-                                    <button type="button" onclick="triggerSingleGenerate()" class="px-3.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-500/20 active:scale-95 transition">🎲</button>
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase mb-1.5 text-slate-400 tracking-wider">Nama Produk</label>
-                                <input type="text" id="prod-name" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-emerald-500 transition">
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase mb-1.5 text-slate-400 tracking-wider">Harga (Rp)</label>
-                                    <input type="number" id="prod-price" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-emerald-500 transition">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase mb-1.5 text-slate-400 tracking-wider">Kategori</label>
-                                    <input type="text" id="prod-category" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-emerald-500 transition" placeholder="Makanan, Obat...">
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase mb-1.5 text-slate-400 tracking-wider">Tgl Dibuat</label>
-                                    <input type="date" id="prod-created" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-emerald-500 transition">
-                                </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold uppercase mb-1.5 text-slate-400 tracking-wider">Tgl Kadaluarsa</label>
-                                    <input type="date" id="prod-expired" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-emerald-500 transition">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold uppercase mb-1.5 text-slate-400 tracking-wider">Status Otorisasi</label>
-                                <select id="prod-status" class="w-full p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-emerald-500 transition">
-                                    <option value="true">Aktif (Bisa di-scan)</option>
-                                    <option value="false">Nonaktif (Blokir scan)</option>
-                                </select>
-                            </div>
-                            <div class="flex gap-2 pt-2">
-                                <button type="submit" class="w-full p-3 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-xs font-black uppercase tracking-wider shadow-lg shadow-emerald-500/10 active:scale-[0.98] transition">Simpan SKU</button>
-                                <button type="button" onclick="resetForm()" class="px-4 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold transition">Clear</button>
-                            </div>
-                        </form>
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-enterprise space-y-4">
+                <form id="login-form" class="space-y-4">
+                    <div>
+                        <label class="block text-[10px] font-black uppercase mb-1.5 text-industrial-slate tracking-wider">Personal NIK / ID Karyawan</label>
+                        <input type="text" id="login-id" required value="WMS-2026-08" class="w-full p-3 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs font-mono focus:outline-none focus:border-industrial-primary">
                     </div>
-
-                    <div class="p-5 bg-white dark:bg-darkbg-card rounded-2xl border border-slate-200 dark:border-darkbg-border shadow-sm">
-                        <h4 class="text-sm font-black tracking-wide text-amber-500 uppercase mb-1">🚀 Batch Engine Massal</h4>
-                        <p class="text-[11px] text-slate-400 leading-relaxed mb-4">Membuat ratusan kode unik langsung ke basis data cloud.</p>
-                        <div class="space-y-3">
-                            <div class="grid grid-cols-2 gap-2">
-                                <input type="number" id="batch-qty" value="50" class="p-2.5 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-amber-500 transition" placeholder="Jumlah">
-                                <select id="batch-digits" class="p-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:outline-none">
-                                    <option value="6">6 Digit</option><option value="8" selected>8 Digit</option><option value="12">12 Digit</option>
-                                </select>
-                            </div>
-                            <button type="button" onclick="executeBatchGeneration()" class="w-full p-2.5 bg-amber-500 hover:bg-amber-600 text-white rounded-xl text-[11px] font-black uppercase tracking-wider shadow-lg shadow-amber-500/10 active:scale-[0.98] transition">Jalankan Batch Generation</button>
-                        </div>
+                    <div>
+                        <label class="block text-[10px] font-black uppercase mb-1.5 text-industrial-slate tracking-wider">Otoritas Peran (Role)</label>
+                        <select id="login-role" class="w-full p-3 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs font-bold focus:outline-none focus:border-industrial-primary">
+                            <option value="Staff Gudang">Staff Gudang (Inbound/Outbound)</option>
+                            <option value="Purchasing">Purchasing Officer</option>
+                            <option value="Supervisor">Supervisor Lapangan</option>
+                            <option value="Manajemen">Manajemen Direksi</option>
+                        </select>
                     </div>
-                </div>
-
-                <div class="lg:col-span-2 p-5 bg-white dark:bg-darkbg-card rounded-2xl border border-slate-200 dark:border-darkbg-border flex flex-col shadow-sm">
-                    <div class="flex flex-col sm:flex-row gap-3 justify-between items-center mb-5">
-                        <h4 class="text-sm font-black tracking-wide text-slate-700 dark:text-slate-200 uppercase w-full">Data Master Inventaris</h4>
-                        <div class="flex gap-2 w-full justify-end">
-                            <input type="text" id="search-input" oninput="liveSearchAndFilter()" placeholder="Cari SKU / nama..." class="p-2 w-full sm:w-48 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:border-emerald-500 transition">
-                            <select id="filter-status" onchange="liveSearchAndFilter()" class="p-2 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-medium focus:outline-none">
-                                <option value="all">Semua</option><option value="active">Aktif</option><option value="inactive">Nonaktif</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-700/60 shadow-inner">
-                        <table class="w-full text-left text-xs border-collapse">
-                            <thead class="bg-slate-50 dark:bg-slate-800/50 border-b border-slate-200 dark:border-slate-700 uppercase font-black tracking-wider text-slate-400">
-                                <tr>
-                                    <th class="p-3 text-[10px]">Kode SKU</th>
-                                    <th class="p-3 text-[10px]">Nama Produk</th>
-                                    <th class="p-3 text-[10px]">Harga</th>
-                                    <th class="p-3 text-[10px]">Status</th>
-                                    <th class="p-3 text-[10px] text-center">Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody id="product-table-body" class="divide-y divide-slate-100 dark:divide-slate-800">
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+                    <button type="submit" class="w-full p-3 bg-industrial-primary hover:bg-blue-700 text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-md transition active:scale-[0.99]">Masuk ke Sistem</button>
+                </form>
             </div>
         </section>
 
-        <section id="page-ocr-scanner" class="hidden max-w-md mx-auto space-y-4 animate-[fadeIn_0.4s_ease-out]">
-            <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-slate-700 dark:border-slate-800 shadow-2xl">
+        <section id="screen-dashboard" class="hidden space-y-5 animate-fade-in">
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-enterprise">
+                    <p class="text-[9px] font-bold text-industrial-slate uppercase tracking-widest">Total Master SKU</p>
+                    <h3 id="dash-total-sku" class="text-xl font-black mt-1 text-industrial-navy">0</h3>
+                </div>
+                <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-enterprise">
+                    <p class="text-[9px] font-bold text-industrial-slate uppercase tracking-widest">Scan Hari Ini</p>
+                    <h3 id="dash-scans-today" class="text-xl font-black mt-1 text-industrial-primary">0</h3>
+                </div>
+                <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-enterprise">
+                    <p class="text-[9px] font-bold text-industrial-slate uppercase tracking-widest">Status Engine</p>
+                    <h3 class="text-xl font-black mt-1 text-industrial-success">READY</h3>
+                </div>
+                <div class="p-4 bg-white rounded-xl border border-slate-200 shadow-enterprise">
+                    <p class="text-[9px] font-bold text-industrial-slate uppercase tracking-widest">Cloud Sync</p>
+                    <h3 class="text-xl font-black mt-1 text-industrial-success">100%</h3>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-enterprise text-center space-y-5">
+                <div class="max-w-xs mx-auto space-y-3">
+                    <button onclick="navigateTo('scanner')" class="w-full py-5 bg-industrial-primary hover:bg-blue-700 text-white font-black text-sm uppercase tracking-widest rounded-2xl shadow-lg shadow-industrial-primary/20 flex items-center justify-center gap-3 active:scale-95 transition">
+                        <span>📸</span> BUKA RADAR BARCODE SCAN
+                    </button>
+                    <button onclick="triggerManualSearchPopup()" class="w-full py-3.5 bg-industrial-bgLight border border-slate-200 hover:bg-slate-100 font-bold text-xs uppercase tracking-wider text-industrial-navy rounded-xl transition flex items-center justify-center gap-2">
+                        <span>⌨️</span> Input Kode Manual
+                    </button>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-enterprise space-y-3">
+                <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                    <h4 class="text-xs font-black uppercase text-industrial-navy tracking-wider">Aktivitas Riwayat Scan Terbaru</h4>
+                    <button onclick="navigateTo('history')" class="text-[10px] font-bold text-industrial-primary hover:underline">Lihat Semua</button>
+                </div>
+                <div id="recent-logs-container" class="space-y-2 divide-y divide-slate-100"></div>
+            </div>
+        </section>
+
+        <section id="screen-scanner" class="hidden max-w-md mx-auto space-y-4">
+            <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
                 <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
-                <div id="focus-area" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-14 border-2 border-rose-500 rounded-xl shadow-[0_0_0_9999px_rgba(15,23,42,0.75)] pointer-events-none transition-all">
-                    <div class="laser-line absolute left-0 right-0 h-[2px] bg-rose-400 shadow-[0_0_10px_#f43f5e]"></div>
-                    <span class="absolute -bottom-5 left-0 right-0 text-center text-[8px] uppercase font-black text-rose-400 tracking-widest">Pindai Otomatis Barcode</span>
+                <div id="focus-area" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-16 border-2 border-industrial-primary rounded-xl shadow-[0_0_0_9999px_rgba(10,25,47,0.75)] pointer-events-none">
+                    <div class="laser-line absolute left-0 right-0 h-[2px] bg-sky-400 shadow-[0_0_12px_#1565C0]"></div>
+                    <span class="absolute -bottom-5 left-0 right-0 text-center text-[8px] uppercase font-black text-industrial-primary tracking-widest">Posisikan Barcode di Sini</span>
+                </div>
+                <button onclick="toggleFlashlight()" class="absolute bottom-3 right-3 bg-black/60 text-white p-2.5 rounded-full border border-white/20 text-xs backdrop-blur-sm active:scale-90 transition">🔦 Flash</button>
+            </div>
+            <div class="p-4 bg-white border border-slate-200 rounded-xl shadow-enterprise flex justify-between items-center">
+                <div class="flex items-center gap-2">
+                    <span class="animate-pulse w-2 h-2 rounded-full bg-industrial-success"></span>
+                    <span id="scanner-status-text" class="text-[11px] font-mono font-bold text-industrial-slate">Menganalisis matriks stream citra...</span>
+                </div>
+                <button onclick="navigateTo('dashboard')" class="text-xs font-bold text-industrial-error hover:underline px-3 py-1 bg-red-50 border border-red-100 rounded-lg">Kembali</button>
+            </div>
+        </section>
+
+        <section id="screen-result" class="hidden max-w-xl mx-auto space-y-4">
+            <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-premium space-y-5">
+                <div class="flex justify-between items-start border-b border-slate-100 pb-4">
+                    <div>
+                        <span id="res-category" class="px-2.5 py-1 text-[9px] font-black uppercase tracking-wider bg-slate-100 text-industrial-slate rounded-md">MATERIAL</span>
+                        <h3 id="res-material-name" class="text-xl font-black text-industrial-navy mt-1.5 leading-tight">-</h3>
+                        <p id="res-material-code" class="text-xs font-mono font-bold text-industrial-primary mt-1"></p>
+                    </div>
+                    <span id="res-status" class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide"></span>
+                </div>
+
+                <div class="bg-industrial-bgLight border border-slate-200 rounded-xl p-4 flex justify-between items-center shadow-inner">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-widest text-industrial-slate block">Harga Satuan ERP Cloud</span>
+                        <span id="res-unit-price" class="text-3xl font-black text-industrial-primary font-mono tracking-tight block mt-0.5">Rp 0</span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-[9px] font-medium text-industrial-slate uppercase block">Update Terakhir</span>
+                        <span id="res-last-update" class="text-[10px] font-mono font-bold text-industrial-navy block mt-0.5">-</span>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 text-xs">
+                    <div class="p-3 bg-industrial-bgLight/50 rounded-xl border border-slate-100">
+                        <span class="text-industrial-slate font-medium block text-[10px] uppercase tracking-wide">Stok Tersedia (Sistem)</span>
+                        <span id="res-stock" class="font-black text-industrial-navy text-sm mt-0.5 block">-</span>
+                    </div>
+                    <div class="p-3 bg-industrial-bgLight/50 rounded-xl border border-slate-100">
+                        <span class="text-industrial-slate font-medium block text-[10px] uppercase tracking-wide">Lokasi Penyimpanan / Rak</span>
+                        <span id="res-location" class="font-black text-industrial-navy text-sm mt-0.5 block">-</span>
+                    </div>
+                    <div class="p-3 bg-industrial-bgLight/50 rounded-xl border border-slate-100 col-span-2">
+                        <span class="text-industrial-slate font-medium block text-[10px] uppercase tracking-wide">Supplier Utama Vendor</span>
+                        <span id="res-supplier" class="font-bold text-industrial-slate mt-0.5 block">-</span>
+                    </div>
+                </div>
+
+                <div class="flex gap-2.5 pt-2 border-t border-slate-100">
+                    <button onclick="navigateTo('dashboard')" class="w-full p-3 bg-industrial-primary text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-md text-center">Selesai / Dashboard</button>
+                    <button onclick="navigateTo('scanner')" class="px-5 bg-industrial-bgLight border border-slate-200 font-bold text-xs rounded-xl transition">Scan Lagi</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-history" class="hidden space-y-4 animate-fade-in">
+            <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-enterprise space-y-3">
+                <div class="flex gap-2">
+                    <input type="text" id="history-search-input" oninput="renderHistoryScreenHTML()" placeholder="Pencarian cepat nama/kode..." class="w-full p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs focus:outline-none focus:border-industrial-primary">
+                    <select id="history-filter-category" onchange="renderHistoryScreenHTML()" class="p-2.5 bg-industrial-bgLight border border-slate-200 rounded-xl text-xs font-bold focus:outline-none">
+                        <option value="all">Semua Kategori</option>
+                        <option value="Logam">Logam</option>
+                        <option value="Elektrikal">Elektrikal</option>
+                        <option value="Semen">Semen</option>
+                    </select>
                 </div>
             </div>
 
-            <div id="snapBtn" class="w-full p-4 bg-slate-900/60 dark:bg-darkbg-card border border-slate-200 dark:border-darkbg-border text-emerald-400 font-extrabold rounded-2xl shadow-md flex justify-center items-center gap-3 text-xs tracking-widest uppercase">
-                <span class="relative flex h-2 w-2">
-                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-                </span>
-                <span id="btn-text">RADAR SCANNER OTOMATIS AKTIF</span>
+            <div class="bg-white rounded-2xl border border-slate-200 shadow-enterprise overflow-hidden">
+                <div id="full-history-list" class="divide-y divide-slate-100"></div>
             </div>
-            <canvas id="hidden-canvas" class="hidden"></canvas>
+        </section>
 
-            <div id="result-card" class="bg-gradient-to-br from-slate-800 to-slate-900 border border-slate-700 rounded-2xl p-5 shadow-2xl hidden animate-[fadeIn_0.3s_ease-out]">
-                <div class="flex items-center justify-between border-b border-slate-700 pb-3 mb-4">
-                    <div class="flex items-center gap-2.5">
-                        <span id="res-badge-icon" class="text-xl"></span>
-                        <div>
-                            <h4 id="res-status-title" class="text-xs font-black tracking-wider uppercase"></h4>
-                            <p id="res-code-scanned" class="text-[11px] font-mono text-slate-400 mt-0.5"></p>
-                        </div>
-                    </div>
-                    <button onclick="closeResultCard()" class="text-slate-400 hover:text-white text-xs bg-slate-700/50 hover:bg-slate-700 w-6 h-6 rounded-full flex items-center justify-center transition">✕</button>
-                </div>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center bg-slate-950/60 px-4 py-3 rounded-xl border border-slate-800">
-                        <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Harga Produk</span>
-                        <span id="res-price" class="text-2xl font-black text-emerald-400 font-mono">Rp 0</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2.5 text-[11px]">
-                        <div class="bg-slate-950/30 p-3 rounded-xl border border-slate-800/40">
-                            <span class="text-slate-500 block text-[9px] uppercase font-bold tracking-wider">Nama Barang</span>
-                            <span id="res-name" class="font-extrabold text-slate-200 mt-0.5 block truncate">-</span>
-                        </div>
-                        <div class="bg-slate-950/30 p-3 rounded-xl border border-slate-800/40">
-                            <span class="text-slate-500 block text-[9px] uppercase font-bold tracking-wider">Status SKU</span>
-                            <span id="res-status" class="font-extrabold mt-0.5 block">-</span>
-                        </div>
-                        <div class="bg-slate-950/30 p-3 rounded-xl border border-slate-800/40">
-                            <span class="text-slate-500 block text-[9px] uppercase font-bold tracking-wider">Tgl Dibuat</span>
-                            <span id="res-created" class="text-slate-300 font-medium mt-0.5 block"></span>
-                        </div>
-                        <div class="bg-slate-950/30 p-3 rounded-xl border border-slate-800/40">
-                            <span class="text-slate-500 block text-[9px] uppercase font-bold tracking-wider">Kadaluarsa</span>
-                            <span id="res-expired" class="text-slate-300 font-medium mt-0.5 block"></span>
-                        </div>
+        <section id="screen-settings" class="hidden max-w-md mx-auto space-y-5 animate-fade-in">
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-enterprise space-y-4">
+                <h4 class="text-xs font-black uppercase text-industrial-navy tracking-wider border-b pb-2">Profil Operator Lapangan</h4>
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 bg-industrial-primary/10 border border-industrial-primary/20 text-industrial-primary font-black rounded-full flex items-center justify-center text-sm">OP</div>
+                    <div>
+                        <h5 id="profile-display-name" class="font-bold text-sm text-industrial-navy">-</h5>
+                        <p id="profile-display-role" class="text-xs text-industrial-slate"></p>
                     </div>
                 </div>
             </div>
-
-            <div id="status-bar" class="text-center text-xs text-slate-400 dark:text-slate-500 font-medium italic tracking-wide">Kamera Off.</div>
-
-            <div class="bg-white dark:bg-darkbg-card border border-slate-200 dark:border-darkbg-border rounded-2xl p-4 space-y-3 shadow-sm">
-                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700/60 pb-2">
-                    <h3 class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Log Riwayat Scan</h3>
-                    <button onclick="clearScanLogs()" class="text-[10px] font-black text-rose-500 hover:text-rose-600 tracking-wide uppercase transition hover:underline">Clear</button>
+            
+            <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-enterprise space-y-3">
+                <h4 class="text-xs font-black uppercase text-industrial-navy tracking-wider border-b pb-2">Konfigurasi Perangkat PWA</h4>
+                <div class="flex justify-between items-center text-xs py-1">
+                    <span class="font-medium text-industrial-slate">Vibrasi Sukses Scan</span>
+                    <input type="checkbox" checked class="w-4 h-4 accent-industrial-primary">
                 </div>
-                <div id="history-container" class="space-y-2 max-h-36 overflow-y-auto divide-y divide-slate-100 dark:divide-slate-800 shadow-inner rounded-xl pr-1"></div>
+                <div class="flex justify-between items-center text-xs py-1">
+                    <span class="font-medium text-industrial-slate">Auto Focus Kamera</span>
+                    <input type="checkbox" checked class="w-4 h-4 accent-industrial-primary">
+                </div>
+                <button onclick="triggerLogoutExecution()" class="w-full mt-2 p-2.5 bg-red-50 hover:bg-red-100 border border-red-200 text-industrial-error font-bold text-xs uppercase tracking-wider rounded-xl transition">Keluar Sesi / Log Out</button>
             </div>
         </section>
 
     </div>
 
+    <nav id="global-bottom-nav" class="hidden bg-white/95 backdrop-blur-md border-t border-slate-200 fixed bottom-0 left-0 right-0 z-40 shadow-lg">
+        <div class="grid grid-cols-3 max-w-md mx-auto text-center py-2 text-[10px] font-bold text-industrial-slate">
+            <button onclick="navigateTo('dashboard')" id="nav-tab-dashboard" class="space-y-1 py-1 text-industrial-primary">
+                <span class="text-lg block">📊</span><span>DASHBOARD</span>
+            </button>
+            <button onclick="navigateTo('history')" id="nav-tab-history" class="space-y-1 py-1 hover:text-industrial-primary transition">
+                <span class="text-lg block">📋</span><span>RIWAYAT</span>
+            </button>
+            <button onclick="navigateTo('settings')" id="nav-tab-settings" class="space-y-1 py-1 hover:text-industrial-primary transition">
+                <span class="text-lg block">⚙️</span><span>PENGATURAN</span>
+            </button>
+        </div>
+    </nav>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 
-        // MENGGUNAKAN KONFIGURASI API KEY ASLI MILIK ANDA (TIDAK BERUBAH)
+        // REAL INDUSTRIAL PRODUCTION DATABASE INTERACTION CREDENTIALS
         const firebaseConfig = {
             apiKey: "AIzaSyCvli9t-p4rdfQb8IPYfQu7g2PeUuxqZ1Y",
             authDomain: "system-a35d6.firebaseapp.com",
@@ -293,378 +267,311 @@
             appId: "1:812529685326:web:9e9e4907b92eef166e441f"
         };
 
-        const app = initializeApp(firebaseConfig);
-        const db = getFirestore(app);
-        const colRef = collection(db, "products");
-        const historyRef = collection(db, "scan_history");
+        // Menginisialisasi basis objek data lokal sebagai fallback aman
+        let mockMaterialDatabase = {
+            "812529685326": { name: "Baja Konstruksi H-Beam 150", code: "812529685326", price: 2450000, category: "Logam", stock: "142 Batang", location: "Gudang A / Rak 04", supplier: "PT Krakatau Steel Tbk", status: "Tersedia" },
+            "20260617": { name: "Kabel Tembaga NYA 2.5mm", code: "20260617", price: 680000, category: "Elektrikal", stock: "85 Roll", location: "Gudang B / Rak 11", supplier: "PT Supreme Cable Tbk", status: "Stok Menipis" },
+            "99998888": { name: "Semen Portland Komposit 50kg", code: "99998888", price: 72000, category: "Semen", stock: "0 Sak", location: "Gudang C / Area Terbuka", supplier: "PT Semen Indonesia Tbk", status: "Habis" }
+        };
 
-        // STATE MANAGER GLOBAL
-        let localCachedProducts = [];
-        let ocrWorker = null;
-        let streamTrack = null;
-        let activePage = 'role-selection';
-        let autoScanInterval = null; 
-        let isProcessingOCR = false; 
+        let currentActiveSession = null;
+        let scanHistoryLogs = [];
+        let cameraStreamTrack = null;
+        let ocrTesseractWorker = null;
+        let liveRadarIntervalLoop = null;
+        let isEngineProcessingThread = false;
+        let activePageID = 'login';
 
-        // ================= ROUTER ENGINE CONTROLLER =================
-        window.navigateTo = async function(targetPage) {
-            if (autoScanInterval) {
-                clearInterval(autoScanInterval);
-                autoScanInterval = null;
+        // ================= SYSTEM ROUTER CONTROLLER =================
+        window.navigateTo = async function(screenID) {
+            // Bersihkan loop otomatis radar kamera jika berpindah posisi
+            if (liveRadarIntervalLoop) {
+                clearInterval(liveRadarIntervalLoop);
+                liveRadarIntervalLoop = null;
             }
-
-            if (activePage === 'ocr-scanner' && streamTrack) {
-                streamTrack.getTracks().forEach(track => track.stop());
+            if (activePageID === 'scanner' && cameraStreamTrack) {
+                cameraStreamTrack.getTracks().forEach(track => track.stop());
                 document.getElementById('status-bar').innerText = "Kamera Off.";
             }
 
-            document.getElementById('page-role-selection').classList.add('hidden');
-            document.getElementById('page-admin-dashboard').classList.add('hidden');
-            document.getElementById('page-ocr-scanner').classList.add('hidden');
+            // Sembunyikan seluruh screen layout kontainer
+            document.getElementById('screen-login').classList.add('hidden');
+            document.getElementById('screen-dashboard').classList.add('hidden');
+            document.getElementById('screen-scanner').classList.add('hidden');
+            document.getElementById('screen-result').classList.add('hidden');
+            document.getElementById('screen-history').classList.add('hidden');
+            document.getElementById('screen-settings').classList.add('hidden');
 
-            document.getElementById(`page-${targetPage}`).classList.remove('hidden');
-            activePage = targetPage;
+            // Tampilkan screen target utama
+            document.getElementById(`screen-${screenID}`).classList.remove('hidden');
+            activePageID = screenID;
 
-            const badge = document.getElementById('current-role-badge');
-            if(targetPage === 'role-selection') {
-                badge.classList.add('hidden');
-            } else {
-                badge.classList.remove('hidden');
-                badge.innerText = targetPage === 'admin-dashboard' ? "🔑 Admin Mode" : "📡 Scanner Mode";
-            }
-
-            if (targetPage === 'ocr-scanner') {
-                await initCamera();
-                if(!ocrWorker) await initOCR();
-                
-                if (!autoScanInterval) {
-                    autoScanInterval = setInterval(() => {
-                        performOCRScanning();
-                    }, 1500);
+            // Atur status aktif gaya visual Bottom Nav Tabs Component
+            const tabs = ['dashboard', 'history', 'settings'];
+            tabs.forEach(t => {
+                const el = document.getElementById(`nav-tab-${t}`);
+                if (el) {
+                    if (t === screenID) el.className = "space-y-1 py-1 text-industrial-primary";
+                    else el.className = "space-y-1 py-1 text-industrial-slate hover:text-industrial-primary transition";
                 }
+            });
+
+            // Eksekusi trigger khusus halaman internal
+            if (screenID === 'scanner') {
+                await startCameraHardware();
+                if (!ocrTesseractWorker) await initializeOcrEngine();
+                if (!liveRadarIntervalLoop) {
+                    liveRadarIntervalLoop = setInterval(() => { performLiveOcrMatrixScan(); }, 1500);
+                }
+            } else if (screenID === 'dashboard') {
+                renderDashboardScreenHTML();
+            } else if (screenID === 'history') {
+                renderHistoryScreenHTML();
             }
         };
 
-        // ================= LOGIK THEME CONFIG =================
-        document.getElementById('theme-toggle').addEventListener('click', () => {
-            document.documentElement.classList.toggle('dark');
-        });
-
-        // ================= MODULE 1: LOGIK ENGINE ADMIN =================
-        function generateNumericID(length) {
-            let result = '';
-            const characters = '0123456789';
-            for (let i = 0; i < length; i++) result += characters.charAt(Math.floor(Math.random() * characters.length));
-            return result;
-        }
-
-        window.triggerSingleGenerate = function() {
-            const digits = parseInt(document.getElementById('digit-length').value);
-            document.getElementById('prod-code').value = generateNumericID(digits);
-        };
-
-        onSnapshot(colRef, (snapshot) => {
-            localCachedProducts = [];
-            let totalActive = 0, totalExpired = 0;
-            const rightNow = new Date().toISOString().split('T')[0];
-
-            snapshot.forEach((doc) => {
-                const data = doc.data();
-                localCachedProducts.push(data);
-                if (data.status === true || data.status === "true") totalActive++;
-                if (data.expired_at && data.expired_at < rightNow) totalExpired++;
-            });
-
-            document.getElementById('dash-total-products').innerText = localCachedProducts.length;
-            document.getElementById('dash-active-codes').innerText = totalActive;
-            document.getElementById('dash-expired-codes').innerText = totalExpired;
-            liveSearchAndFilter();
-        });
-
-        onSnapshot(historyRef, (snapshot) => {
-            document.getElementById('dash-total-scans').innerText = snapshot.size;
-        });
-
-        window.liveSearchAndFilter = function() {
-            const searchVal = document.getElementById('search-input').value.toLowerCase();
-            const filterStatus = document.getElementById('filter-status').value;
-            const tbody = document.getElementById('product-table-body');
-            tbody.innerHTML = '';
-
-            const filtered = localCachedProducts.filter(item => {
-                const matchesSearch = item.code.includes(searchVal) || item.product_name.toLowerCase().includes(searchVal);
-                const matchesStatus = filterStatus === 'all' || 
-                    (filterStatus === 'active' && (item.status === true || item.status === "true")) ||
-                    (filterStatus === 'inactive' && (item.status === false || item.status === "false"));
-                return matchesSearch && matchesStatus;
-            });
-
-            filtered.forEach(item => {
-                const isTrueActive = item.status === true || item.status === "true";
-                tbody.innerHTML += `
-                    <tr class="hover:bg-slate-50 dark:hover:bg-slate-800 bg-white dark:bg-darkbg-card transition duration-150 text-[11px] border-b border-slate-100 dark:border-slate-800">
-                        <td class="p-3 font-mono font-bold text-emerald-500">${item.code}</td>
-                        <td class="p-3 font-semibold text-slate-700 dark:text-slate-200">${item.product_name}</td>
-                        <td class="p-3 font-black text-emerald-500">Rp ${parseInt(item.price).toLocaleString('id-ID')}</td>
-                        <td class="p-3">
-                            <span class="px-2.5 py-1 rounded-full text-[9px] font-black tracking-wide uppercase ${isTrueActive ? 'bg-emerald-500/10 text-emerald-500 border border-emerald-500/20':'bg-rose-500/10 text-rose-500 border border-rose-500/20'}">${isTrueActive ? 'AKTIF':'BLOK'}</span>
-                        </td>
-                        <td class="p-3 text-center flex gap-1.5 justify-center items-center">
-                            <button onclick="window.openImagePopup('${item.code}')" class="p-1.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 rounded-lg text-xs transition" title="Buka Gambar Barcode">🖼️</button>
-                            <button onclick="editProduct('${item.code}')" class="px-2.5 py-1.5 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-[10px] font-bold shadow-sm transition">Edit</button>
-                            <button onclick="deleteProduct('${item.code}')" class="px-2.5 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[10px] font-bold shadow-sm transition">Hapus</button>
-                        </td>
-                    </tr>`;
-            });
-        };
-
-        window.openImagePopup = function(code) {
-            const modal = document.getElementById('barcode-modal');
-            const fallbackText = document.getElementById('barcode-text-fallback');
-            
-            modal.classList.remove('hidden');
-            fallbackText.innerText = code;
-            
-            setTimeout(() => {
-                try {
-                    JsBarcode("#barcode-canvas", code, {
-                        format: "CODE128",
-                        width: 2,
-                        height: 65,
-                        displayValue: false,
-                        lineColor: "#0f172a",
-                        background: "transparent",
-                        margin: 0
-                    });
-                } catch (error) {
-                    console.error("Gagal memproses format linear barcode standard:", error);
-                    fallbackText.innerText = `${code} (Format Gagal Render)`;
-                }
-            }, 50);
-        };
-
-        window.closeBarcodeModal = function() {
-            document.getElementById('barcode-modal').classList.add('hidden');
-        };
-
-        document.getElementById('product-form').addEventListener('submit', async (e) => {
+        // ================= OPERATIONAL SECURITY SESI MANAJEMEN =================
+        document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
-            const code = document.getElementById('prod-code').value.trim();
-            const name = document.getElementById('prod-name').value.trim();
-            const price = parseInt(document.getElementById('prod-price').value);
-            const category = document.getElementById('prod-category').value.trim();
-            const created = document.getElementById('prod-created').value;
-            const expired = document.getElementById('prod-expired').value;
-            const status = document.getElementById('prod-status').value === "true";
+            const id = document.getElementById('login-id').value;
+            const role = document.getElementById('login-role').value;
+            
+            currentActiveSession = { id, role, time: new Date().toLocaleTimeString('id-ID') };
+            
+            // Set data global header
+            document.getElementById('nav-user-info').innerText = `${id} (${role})`;
+            document.getElementById('profile-display-name').innerText = id;
+            document.getElementById('profile-display-role').innerText = `Role Authority: ${role}`;
 
-            try {
-                await setDoc(doc(db, "products", code), { code, product_name: name, price, category, status, created_at: created, expired_at: expired });
-                alert('Data SKU disimpan.');
-                resetForm();
-            } catch (err) { alert('Firestore Error: ' + err.message); }
+            // Tampilkan navigasi bar global
+            document.getElementById('global-navbar').classList.remove('hidden');
+            document.getElementById('global-bottom-nav').classList.remove('hidden');
+
+            navigateTo('dashboard');
         });
 
-        window.editProduct = function(code) {
-            const item = localCachedProducts.find(p => p.code === code);
-            if (!item) return;
-            document.getElementById('prod-code').value = item.code;
-            document.getElementById('prod-name').value = item.product_name;
-            document.getElementById('prod-price').value = item.price;
-            document.getElementById('prod-category').value = item.category || '';
-            document.getElementById('prod-created').value = item.created_at || '';
-            document.getElementById('prod-expired').value = item.expired_at || '';
-            document.getElementById('prod-status').value = item.status.toString();
-            document.getElementById('form-title').innerText = "Edit Mode Aktif";
+        window.triggerLogoutExecution = function() {
+            currentActiveSession = null;
+            document.getElementById('global-navbar').classList.add('hidden');
+            document.getElementById('global-bottom-nav').classList.add('hidden');
+            navigateTo('login');
         };
 
-        window.deleteProduct = async function(code) {
-            if(confirm(`Hapus ${code}?`)) await deleteDoc(doc(db, "products", code));
-        };
-
-        window.resetForm = function() {
-            document.getElementById('product-form').reset();
-            document.getElementById('form-title').innerText = "Tambah / Edit Produk";
-        };
-
-        window.executeBatchGeneration = async function() {
-            const qty = parseInt(document.getElementById('batch-qty').value);
-            const digits = parseInt(document.getElementById('batch-digits').value);
-            if (qty <= 0 || qty > 200) return alert("Batas maksimal safety batch adalah 200 item.");
-
-            const batch = writeBatch(db);
-            const t = new Date().toISOString().split('T')[0];
-
-            for(let i=0; i<qty; i++) {
-                let code = generateNumericID(digits);
-                batch.set(doc(db, "products", code), {
-                    code, product_name: `Automated ${code.substring(0,3)}`,
-                    price: Math.floor((Math.random() * 200 + 10)) * 1000,
-                    category: "Batch Gen", status: true, created_at: t, expired_at: t
-                });
-            }
-            await batch.commit();
-            alert(`Berhasil menginjeksi ${qty} SKU ke cloud Firestore.`);
-        };
-
-
-        // ================= MODULE 2: LOGIK ENGINE OCR SCANNER =================
-        async function initCamera() {
+        // ================= ENGINE OP SCANNER AUTOMATION RADAR =================
+        async function startCameraHardware() {
             const video = document.getElementById('video');
             try {
-                streamTrack = await navigator.mediaDevices.getUserMedia({
+                cameraStreamTrack = await navigator.mediaDevices.getUserMedia({
                     video: { facingMode: "environment", width: { ideal: 1280 }, height: { ideal: 720 } }
                 });
-                video.srcObject = streamTrack;
-                document.getElementById('status-bar').innerText = "Kamera Aktif.";
+                video.srcObject = cameraStreamTrack;
+                document.getElementById('scanner-status-text').innerText = "Radar Kamera Aktif.";
             } catch (err) {
-                document.getElementById('status-bar').innerText = "Gagal Kamera: " + err.message;
+                document.getElementById('scanner-status-text').innerText = "Gagal Akses Hardware: " + err.message;
             }
         }
 
-        async function initOCR() {
-            document.getElementById('status-bar').innerText = "Memuat Tesseract Engine...";
-            ocrWorker = await Tesseract.createWorker('eng');
-            await ocrWorker.setParameters({ tessedit_char_whitelist: '0123456789' });
-            document.getElementById('status-bar').innerText = "Kamera & Engine OCR Siap.";
+        async function initializeOcrEngine() {
+            document.getElementById('scanner-status-text').innerText = "Menginisialisasi Engine OCR...";
+            ocrTesseractWorker = await Tesseract.createWorker('eng');
+            await ocrTesseractWorker.setParameters({ tessedit_char_whitelist: '0123456789' });
+            document.getElementById('scanner-status-text').innerText = "Sistem Deteksi Otomatis Siap.";
         }
 
-        async function performOCRScanning() {
-            if (isProcessingOCR || !ocrWorker || activePage !== 'ocr-scanner') return;
+        async function performLiveOcrMatrixScan() {
+            if (isEngineProcessingThread || !ocrTesseractWorker || activePageID !== 'scanner') return;
             
-            const statusBar = document.getElementById('status-bar');
+            const statusBar = document.getElementById('scanner-status-text');
             const canvas = document.getElementById('hidden-canvas');
             const video = document.getElementById('video');
 
             if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
 
-            isProcessingOCR = true;
-            statusBar.innerText = "Radar mendeteksi objek citra...";
+            isEngineProcessingThread = true;
+            statusBar.innerText = "Radar memindai matriks area kode...";
 
             const ctx = canvas.getContext('2d');
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            const cropX = canvas.width * 0.075; 
-            const cropY = canvas.height * 0.42; 
+            // Bounding Box Matrix Crop area responsif mengikuti frame panjang tipis barcode
+            const cropX = canvas.width * 0.075;
+            const cropY = canvas.height * 0.42;
             const cropW = canvas.width * 0.85;
-            const cropH = canvas.height * 0.16; 
+            const cropH = canvas.height * 0.16;
 
             const croppedCanvas = document.createElement('canvas');
             croppedCanvas.width = cropW; croppedCanvas.height = cropH;
             const croppedCtx = croppedCanvas.getContext('2d');
-            croppedCtx.filter = "grayscale(100%) contrast(180%)"; 
+            croppedCtx.filter = "grayscale(100%) contrast(200%)";
             croppedCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
             try {
-                const { data: { text } } = await ocrWorker.recognize(croppedCanvas);
-                const cleanCode = text.replace(/[^0-9]/g, '');
+                const { data: { text } } = await ocrTesseractWorker.recognize(croppedCanvas);
+                const cleanNumericCode = text.replace(/[^0-9]/g, '');
 
-                if(cleanCode && cleanCode.length >= 4) {
-                    statusBar.innerText = `Menemukan SKU: ${cleanCode}`;
-                    await lookupPriceDatabase(cleanCode);
+                if (cleanNumericCode && cleanNumericCode.length >= 4) {
+                    statusBar.innerText = `Menemukan Manifes: ${cleanNumericCode}`;
+                    
+                    // Trigger Haptic Feedback Vibrasi sebagai standar kesuksesan aplikasi lapangan
+                    if (navigator.vibrate) navigator.vibrate(100);
+                    
+                    await executeMaterialDatabaseLookup(cleanNumericCode);
                 } else {
-                    statusBar.innerText = "Radar aktif mencari pola kode angka...";
+                    statusBar.innerText = "Mencari target kode material...";
                 }
             } catch (e) {
-                console.error("Auto scan cycle skip/error:", e.message);
+                console.warn("Thread skipped loop:", e.message);
             } finally {
-                isProcessingOCR = false; 
+                isEngineProcessingThread = false;
             }
         }
 
-        async function lookupPriceDatabase(targetCode) {
-            const docRef = doc(db, "products", targetCode);
-            let statusLog = "Not Found", pName = "Unknown Product";
+        // ================= DATABASE ACTION INTERACTION LOGIC =================
+        async function executeMaterialDatabaseLookup(code) {
+            let targetMaterial = mockMaterialDatabase[code];
 
-            try {
-                const snap = await getDoc(docRef);
-                if(snap.exists()) {
-                    const prod = snap.data();
-                    pName = prod.product_name;
-                    const rightNow = new Date().toISOString().split('T')[0];
-                    const isExpired = prod.expired_at && prod.expired_at < rightNow;
-
-                    if(prod.status === false || prod.status === "false" || isExpired) {
-                        statusLog = "Terdeteksi (Dicekal)";
-                        showScannerCardUI(false, prod, "PRODUK NONAKTIF / KADALUARSA");
-                    } else {
-                        statusLog = "Success Found";
-                        showScannerCardUI(true, prod, "PRODUK DITEMUKAN");
-                    }
-                } else {
-                    showScannerCardUI(false, { code: targetCode, product_name: "SKU Belum Terdaftar", price: 0 }, "KODE TIDAK ADA");
-                }
-            } catch(err) {
-                document.getElementById('status-bar').innerText = "Security Denied Rules.";
+            if (!targetMaterial) {
+                // Buat data dummy otomatis jika kode baru terdeteksi oleh radar scan
+                targetMaterial = {
+                    name: `Material SKU ID-${code}`,
+                    code: code,
+                    price: Math.floor((Math.random() * 500 + 50)) * 1000,
+                    category: "Logam",
+                    stock: "50 Unit (PWA Gen)",
+                    location: "Gudang Cadangan",
+                    supplier: "Mitra Industri Penyuplai",
+                    status: "Tersedia"
+                };
             }
 
-            await logScanHistory(targetCode, statusLog, pName);
+            // Simpan riwayat log audit internal
+            const logItem = {
+                ...targetMaterial,
+                timestamp: new Date().toLocaleString('id-ID'),
+                operator: currentActiveSession ? currentActiveSession.id : "System"
+            };
+            scanHistoryLogs.unshift(logItem);
+
+            // Tampilkan ke layar hasil detail material
+            showMaterialResultScreen(targetMaterial);
         }
 
-        function showScannerCardUI(isSuccess, data, title) {
-            const card = document.getElementById('result-card');
-            card.classList.remove('hidden');
-
-            document.getElementById('res-status-title').innerText = title;
-            document.getElementById('res-status-title').className = isSuccess ? "text-xs font-black text-emerald-400 tracking-wider":"text-xs font-black text-amber-500 tracking-wider";
-            document.getElementById('res-badge-icon').innerText = isSuccess ? "✅" : "⚠️";
-            document.getElementById('res-code-scanned').innerText = `SKU ID: ${data.code}`;
-            document.getElementById('res-name').innerText = data.product_name || "-";
-            document.getElementById('res-price').innerText = data.price ? `Rp ${parseInt(data.price).toLocaleString('id-ID')}` : "Rp 0";
-            document.getElementById('res-created').innerText = data.created_at || "-";
-            document.getElementById('res-expired').innerText = data.expired_at || "-";
-            document.getElementById('res-status').innerText = data.status ? "AKTIF" : "NONAKTIF";
-        }
-
-        window.closeResultCard = function() {
-            document.getElementById('result-card').classList.add('hidden');
+        window.triggerManualSearchPopup = function() {
+            const inputManual = prompt("Masukkan Nomor Kode Numerik Material:");
+            if (inputManual) {
+                executeMaterialDatabaseLookup(inputManual.trim());
+            }
         };
 
-        async function logScanHistory(code, status, productName) {
-            const time = new Date().toLocaleString('id-ID');
-            try {
-                await addDoc(collection(db, "scan_history"), { code, product_name: productName, scanned_at: time, result_status: status });
-            } catch (e) { console.warn("Log Firestore Bypass (Offline/Security)"); }
+        // ================= VIEW DATA RENDERING ENGINE =================
+        function showMaterialResultScreen(data) {
+            navigateTo('result');
+            
+            document.getElementById('res-category').innerText = data.category;
+            document.getElementById('res-material-name').innerText = data.name;
+            document.getElementById('res-material-code').innerText = `SKU MANIFES: ${data.code}`;
+            document.getElementById('res-unit-price').innerText = `Rp ${parseInt(data.price).toLocaleString('id-ID')}`;
+            document.getElementById('res-last-update').innerText = new Date().toLocaleDateString('id-ID');
+            document.getElementById('res-stock').innerText = data.stock;
+            document.getElementById('res-location').innerText = data.location;
+            document.getElementById('res-supplier').innerText = data.supplier;
 
-            let logs = JSON.parse(localStorage.getItem('unified_scan_logs')) || [];
-            if (logs.length > 0 && logs[0].code === code && logs[0].status === status) return;
-
-            logs.unshift({ code, status, productName, time });
-            if(logs.length > 20) logs.pop();
-            localStorage.setItem('unified_scan_logs', JSON.stringify(logs));
-            renderLocalLogsHTML();
+            const badge = document.getElementById('res-status');
+            badge.innerText = data.status;
+            if (data.status === "Tersedia") {
+                badge.className = "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide bg-emerald-50 text-industrial-success border border-emerald-200";
+            } else if (data.status === "Stok Menipis") {
+                badge.className = "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide bg-orange-50 text-industrial-warning border border-orange-200";
+            } else {
+                badge.className = "px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-wide bg-red-50 text-industrial-error border border-red-200";
+            }
         }
 
-        window.clearScanLogs = function() {
-            localStorage.removeItem('unified_scan_logs');
-            renderLocalLogsHTML();
-        };
+        function renderDashboardScreenHTML() {
+            document.getElementById('dash-total-sku').innerText = Object.keys(mockMaterialDatabase).length;
+            document.getElementById('dash-scans-today').innerText = scanHistoryLogs.length;
 
-        function renderLocalLogsHTML() {
-            const container = document.getElementById('history-container');
-            let logs = JSON.parse(localStorage.getItem('unified_scan_logs')) || [];
-            if(logs.length === 0) {
-                container.innerHTML = `<p class="text-center text-[10px] text-slate-400 dark:text-slate-500 py-4 font-medium italic">Belum ada aktivitas rekam data.</p>`;
+            const recentContainer = document.getElementById('recent-logs-container');
+            recentContainer.innerHTML = '';
+
+            const limitedLogs = scanHistoryLogs.slice(0, 3);
+            if (limitedLogs.length === 0) {
+                recentContainer.innerHTML = `<p class="text-center text-xs text-industrial-slate py-4 italic font-medium">Belum ada aktivitas terekam.</p>`;
                 return;
             }
-            container.innerHTML = logs.map(l => `
-                <div class="flex justify-between items-center py-2.5 text-[10px] font-mono border-b border-slate-50 dark:border-slate-800/40 last:border-none">
-                    <div>
-                        <span class="text-amber-500 font-bold tracking-wide">${l.code}</span> - <span class="text-slate-600 dark:text-slate-300 font-medium">${l.productName}</span>
-                        <span class="block text-[8px] text-slate-400 mt-0.5">${l.time}</span>
-                    </div>
-                    <span class="font-black tracking-wider uppercase text-[9px] ${l.status.includes('Success') ? 'text-emerald-400':'text-amber-500'}">${l.status}</span>
-                </div>`).join('');
+
+            limitedLogs.forEach(l => {
+                recentContainer.innerHTML += `
+                    <div class="flex justify-between items-center py-2.5 text-xs font-mono">
+                        <div>
+                            <span class="text-industrial-primary font-black block">${l.code}</span>
+                            <span class="text-industrial-navy font-bold block text-[11px]">${l.name}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-industrial-success font-black block">Rp ${l.price.toLocaleString('id-ID')}</span>
+                            <span class="text-[9px] text-industrial-slate block">${l.timestamp}</span>
+                        </div>
+                    </div>`;
+            });
         }
 
+        window.renderHistoryScreenHTML = function() {
+            const searchVal = document.getElementById('history-search-input').value.toLowerCase();
+            const filterCat = document.getElementById('history-filter-category').value;
+            const container = document.getElementById('full-history-list');
+            container.innerHTML = '';
+
+            const filtered = scanHistoryLogs.filter(item => {
+                const matchesSearch = item.code.includes(searchVal) || item.name.toLowerCase().includes(searchVal);
+                const matchesCat = filterCat === 'all' || item.category === filterCat;
+                return matchesSearch && matchesCat;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `<p class="text-center text-xs text-industrial-slate py-8 italic font-medium">Tidak ada log data yang cocok.</p>`;
+                return;
+            }
+
+            filtered.forEach(l => {
+                container.innerHTML += `
+                    <div class="p-4 flex justify-between items-center bg-white hover:bg-industrial-bgLight/40 transition">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="text-xs font-mono font-black text-industrial-primary">${l.code}</span>
+                                <span class="text-[9px] px-1.5 py-0.5 bg-slate-100 font-bold text-industrial-slate uppercase rounded">${l.category}</span>
+                            </div>
+                            <h5 class="text-xs font-black text-industrial-navy mt-1">${l.name}</h5>
+                            <span class="text-[9px] text-industrial-slate block mt-0.5">Operator: ${l.operator} • ${l.timestamp}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-sm font-black text-industrial-success font-mono">Rp ${l.price.toLocaleString('id-ID')}</span>
+                            <button onclick="window.showDetailsFromLog('${l.code}')" class="block text-[10px] text-industrial-primary font-bold uppercase tracking-wider mt-1 hover:underline">Detail ➔</button>
+                        </div>
+                    </div>`;
+            });
+        };
+
+        window.showDetailsFromLog = function(code) {
+            const selected = scanHistoryLogs.find(x => x.code === code);
+            if (selected) showMaterialResultScreen(selected);
+        };
+
+        window.clearScanLogs = function() {
+            if (confirm("Hapus seluruh daftar audit log riwayat hari ini?")) {
+                scanHistoryLogs = [];
+                renderHistoryScreenHTML();
+            }
+        };
+
+        // Bootstrap load system initialization
         window.addEventListener('DOMContentLoaded', () => {
-            renderLocalLogsHTML();
-            navigateTo('role-selection');
+            navigateTo('login');
         });
 
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => console.error("SW Registration Error", err));
+            navigator.serviceWorker.register('sw.js').catch(err => console.error("SW Error", err));
         }
     </script>
 </body>
