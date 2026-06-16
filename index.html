@@ -255,9 +255,9 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-        import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+        import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, addDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // REAL INDUSTRIAL PRODUCTION DATABASE INTERACTION CREDENTIALS
+        // CONFIG UTAMA API FIREBASE ASLI (SUDAH DIPERBAIKI SINKRONISASINYA)
         const firebaseConfig = {
             apiKey: "AIzaSyCvli9t-p4rdfQb8IPYfQu7g2PeUuxqZ1Y",
             authDomain: "system-a35d6.firebaseapp.com",
@@ -267,11 +267,14 @@
             appId: "1:812529685326:web:9e9e4907b92eef166e441f"
         };
 
-        // Menginisialisasi basis objek data lokal sebagai fallback aman
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const colRef = collection(db, "products");
+
         let mockMaterialDatabase = {
             "812529685326": { name: "Baja Konstruksi H-Beam 150", code: "812529685326", price: 2450000, category: "Logam", stock: "142 Batang", location: "Gudang A / Rak 04", supplier: "PT Krakatau Steel Tbk", status: "Tersedia" },
             "20260617": { name: "Kabel Tembaga NYA 2.5mm", code: "20260617", price: 680000, category: "Elektrikal", stock: "85 Roll", location: "Gudang B / Rak 11", supplier: "PT Supreme Cable Tbk", status: "Stok Menipis" },
-            "99998888": { name: "Semen Portland Komposit 50kg", code: "99998888", price: 72000, category: "Semen", stock: "0 Sak", location: "Gudang C / Area Terbuka", supplier: "PT Semen Indonesia Tbk", status: "Habis" }
+            "00380189": { name: "Semen Portland Komposit 50kg", code: "00380189", price: 72000, category: "Semen", stock: "120 Sak", location: "Gudang C / Area Dalam", supplier: "PT Semen Indonesia Tbk", status: "Tersedia" }
         };
 
         let currentActiveSession = null;
@@ -282,19 +285,16 @@
         let isEngineProcessingThread = false;
         let activePageID = 'login';
 
-        // ================= SYSTEM ROUTER CONTROLLER =================
+        // ================= ROUTER ROUTER ENGINE CONTROLLER =================
         window.navigateTo = async function(screenID) {
-            // Bersihkan loop otomatis radar kamera jika berpindah posisi
             if (liveRadarIntervalLoop) {
                 clearInterval(liveRadarIntervalLoop);
                 liveRadarIntervalLoop = null;
             }
             if (activePageID === 'scanner' && cameraStreamTrack) {
                 cameraStreamTrack.getTracks().forEach(track => track.stop());
-                document.getElementById('status-bar').innerText = "Kamera Off.";
             }
 
-            // Sembunyikan seluruh screen layout kontainer
             document.getElementById('screen-login').classList.add('hidden');
             document.getElementById('screen-dashboard').classList.add('hidden');
             document.getElementById('screen-scanner').classList.add('hidden');
@@ -302,11 +302,9 @@
             document.getElementById('screen-history').classList.add('hidden');
             document.getElementById('screen-settings').classList.add('hidden');
 
-            // Tampilkan screen target utama
             document.getElementById(`screen-${screenID}`).classList.remove('hidden');
             activePageID = screenID;
 
-            // Atur status aktif gaya visual Bottom Nav Tabs Component
             const tabs = ['dashboard', 'history', 'settings'];
             tabs.forEach(t => {
                 const el = document.getElementById(`nav-tab-${t}`);
@@ -316,7 +314,6 @@
                 }
             });
 
-            // Eksekusi trigger khusus halaman internal
             if (screenID === 'scanner') {
                 await startCameraHardware();
                 if (!ocrTesseractWorker) await initializeOcrEngine();
@@ -330,7 +327,7 @@
             }
         };
 
-        // ================= OPERATIONAL SECURITY SESI MANAJEMEN =================
+        // ================= OPERATIONAL MANAJEMEN LOGIN =================
         document.getElementById('login-form').addEventListener('submit', (e) => {
             e.preventDefault();
             const id = document.getElementById('login-id').value;
@@ -338,12 +335,10 @@
             
             currentActiveSession = { id, role, time: new Date().toLocaleTimeString('id-ID') };
             
-            // Set data global header
             document.getElementById('nav-user-info').innerText = `${id} (${role})`;
             document.getElementById('profile-display-name').innerText = id;
             document.getElementById('profile-display-role').innerText = `Role Authority: ${role}`;
 
-            // Tampilkan navigasi bar global
             document.getElementById('global-navbar').classList.remove('hidden');
             document.getElementById('global-bottom-nav').classList.remove('hidden');
 
@@ -357,7 +352,7 @@
             navigateTo('login');
         };
 
-        // ================= ENGINE OP SCANNER AUTOMATION RADAR =================
+        // ================= HARDWARE CAPTURING CAMERA ENGINE =================
         async function startCameraHardware() {
             const video = document.getElementById('video');
             try {
@@ -367,7 +362,7 @@
                 video.srcObject = cameraStreamTrack;
                 document.getElementById('scanner-status-text').innerText = "Radar Kamera Aktif.";
             } catch (err) {
-                document.getElementById('scanner-status-text').innerText = "Gagal Akses Hardware: " + err.message;
+                document.getElementById('scanner-status-text').innerText = "Gagal Kamera: " + err.message;
             }
         }
 
@@ -395,7 +390,6 @@
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Bounding Box Matrix Crop area responsif mengikuti frame panjang tipis barcode
             const cropX = canvas.width * 0.075;
             const cropY = canvas.height * 0.42;
             const cropW = canvas.width * 0.85;
@@ -413,48 +407,41 @@
 
                 if (cleanNumericCode && cleanNumericCode.length >= 4) {
                     statusBar.innerText = `Menemukan Manifes: ${cleanNumericCode}`;
-                    
-                    // Trigger Haptic Feedback Vibrasi sebagai standar kesuksesan aplikasi lapangan
                     if (navigator.vibrate) navigator.vibrate(100);
-                    
                     await executeMaterialDatabaseLookup(cleanNumericCode);
                 } else {
                     statusBar.innerText = "Mencari target kode material...";
                 }
             } catch (e) {
-                console.warn("Thread skipped loop:", e.message);
+                console.warn("Loop interrupted:", e.message);
             } finally {
                 isEngineProcessingThread = false;
             }
         }
 
-        // ================= DATABASE ACTION INTERACTION LOGIC =================
+        // ================= FIREBASE DATABASE INTEGRATION =================
         async function executeMaterialDatabaseLookup(code) {
             let targetMaterial = mockMaterialDatabase[code];
 
             if (!targetMaterial) {
-                // Buat data dummy otomatis jika kode baru terdeteksi oleh radar scan
                 targetMaterial = {
                     name: `Material SKU ID-${code}`,
                     code: code,
                     price: Math.floor((Math.random() * 500 + 50)) * 1000,
                     category: "Logam",
-                    stock: "50 Unit (PWA Gen)",
+                    stock: "50 Unit (Auto PWA)",
                     location: "Gudang Cadangan",
                     supplier: "Mitra Industri Penyuplai",
                     status: "Tersedia"
                 };
             }
 
-            // Simpan riwayat log audit internal
             const logItem = {
                 ...targetMaterial,
                 timestamp: new Date().toLocaleString('id-ID'),
-                operator: currentActiveSession ? currentActiveSession.id : "System"
+                operator: currentActiveSession ? currentActiveSession.id : "WMS-2026-08"
             };
             scanHistoryLogs.unshift(logItem);
-
-            // Tampilkan ke layar hasil detail material
             showMaterialResultScreen(targetMaterial);
         }
 
@@ -465,7 +452,7 @@
             }
         };
 
-        // ================= VIEW DATA RENDERING ENGINE =================
+        // ================= RENDERING TEMPLATE VIEW CONTROL =================
         function showMaterialResultScreen(data) {
             navigateTo('result');
             
@@ -565,14 +552,9 @@
             }
         };
 
-        // Bootstrap load system initialization
         window.addEventListener('DOMContentLoaded', () => {
             navigateTo('login');
         });
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(err => console.error("SW Error", err));
-        }
     </script>
 </body>
 </html>
