@@ -6,7 +6,7 @@
     <title>Unified Price Code System & OCR Scanner</title>
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#3B82F6">
-    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2311/2311545.png">
+    <link class="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2311/2311545.png">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -370,12 +370,23 @@
                         <td class="p-2.5">
                             <span class="px-2 py-0.5 rounded text-[9px] font-bold ${isTrueActive ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300':'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'}">${isTrueActive ? 'AKTIF':'BLOK'}</span>
                         </td>
-                        <td class="p-2.5 text-center flex gap-1 justify-center">
+                        <td class="p-2.5 text-center flex gap-1 justify-center items-center">
+                            <button onclick="window.openImagePopup('${item.code}')" class="px-1.5 py-0.5 bg-purple-600 hover:bg-purple-700 text-white rounded text-[10px] flex items-center gap-0.5" title="Buka Gambar">🖼️</button>
                             <button onclick="editProduct('${item.code}')" class="px-1.5 py-0.5 bg-blue-500 text-white rounded text-[10px]">Edit</button>
                             <button onclick="deleteProduct('${item.code}')" class="px-1.5 py-0.5 bg-red-600 text-white rounded text-[10px]">Hapus</button>
+                            <button onclick="window.connectBluetoothPrint('${item.code}', '${item.product_name}', '${item.price}')" class="px-1.5 py-0.5 bg-amber-500 hover:bg-amber-600 text-white rounded text-[10px] flex items-center gap-0.5" title="Print Bluetooth">🖨️</button>
                         </td>
                     </tr>`;
             });
+        };
+
+        // Metode Placeholder untuk Fitur Aksi Baru (Gambar & Bluetooth)
+        window.openImagePopup = function(code) {
+            alert(`Membuka berkas gambar/canvas generasi kode numerik: ${code}\n(Citra siap dipindai oleh modul mesin OCR)`);
+        };
+
+        window.connectBluetoothPrint = function(code, name, price) {
+            alert(`Menginisialisasi jabat tangan (handshake) Bluetooth Peripheral...\nMenghubungkan ke Printer Thermal...\nMencetak manifes data:\nSKU: ${code}\nNama: ${name}\nHarga: Rp ${parseInt(price).toLocaleString('id-ID')}`);
         };
 
         document.getElementById('product-form').addEventListener('submit', async (e) => {
