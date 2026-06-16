@@ -264,14 +264,14 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc, addDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // 1. REAL PRODUCTION FIREBASE CONFIGURATION
+        // MENGGUNAKAN KONFIGURASI API KEY ASLI YANG BARU SAJA ANDA KIRIMKAN
         const firebaseConfig = {
-            apiKey: "AIzaSyAsFakeKey_YOUR_ACTUAL_API_KEY",
-            authDomain: "ocr-price-system.firebaseapp.com",
-            projectId: "ocr-price-system",
-            storageBucket: "ocr-price-system.appspot.com",
-            messagingSenderId: "1234567890",
-            appId: "1:1234567890:web:abcdef123456"
+            apiKey: "AIzaSyCvli9t-p4rdfQb8IPYfQu7g2PeUuxqZ1Y",
+            authDomain: "system-a35d6.firebaseapp.com",
+            projectId: "system-a35d6",
+            storageBucket: "system-a35d6.firebasestorage.app",
+            messagingSenderId: "812529685326",
+            appId: "1:812529685326:web:9e9e4907b92eef166e441f"
         };
 
         const app = initializeApp(firebaseConfig);
@@ -284,12 +284,11 @@
         let ocrWorker = null;
         let streamTrack = null;
         let activePage = 'role-selection';
-        let autoScanInterval = null; // Handler loop otomatis
-        let isProcessingOCR = false; // Flag status pengerjaan engine
+        let autoScanInterval = null; 
+        let isProcessingOCR = false; 
 
         // ================= ROUTER ENGINE CONTROLLER =================
         window.navigateTo = async function(targetPage) {
-            // MODIFIKASI: Matikan kamera & bersihkan interval jika pindah dari scanner
             if (autoScanInterval) {
                 clearInterval(autoScanInterval);
                 autoScanInterval = null;
@@ -323,7 +322,6 @@
                 await initCamera();
                 if(!ocrWorker) await initOCR();
                 
-                // MODIFIKASI: Aktifkan Loop Pemicu Otomatis Tiap 1.5 Detik Semenjak Halaman Terbuka
                 if (!autoScanInterval) {
                     autoScanInterval = setInterval(() => {
                         performOCRScanning();
@@ -522,16 +520,13 @@
             document.getElementById('status-bar').innerText = "Kamera & Engine OCR Siap.";
         }
 
-        // MODIFIKASI: Implementasi Algoritma Pemindaian Otomatis Non-Blocking (Tanpa Tekan Tombol)
         async function performOCRScanning() {
-            // Mencegah interupsi eksekusi penumpukan thread jika proses sebelumnya belum rampung
             if (isProcessingOCR || !ocrWorker || activePage !== 'ocr-scanner') return;
             
             const statusBar = document.getElementById('status-bar');
             const canvas = document.getElementById('hidden-canvas');
             const video = document.getElementById('video');
 
-            // Cek kesiapan frame stream video dari driver kamera perangkat
             if (video.readyState !== video.HAVE_ENOUGH_DATA) return;
 
             isProcessingOCR = true;
@@ -542,16 +537,15 @@
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // MODIFIKASI: Koreksi Matriks Koordinat Crop Menyesuaikan Bingkai Barcode Memanjang Pipih (W:[85%], H:14)
-            const cropX = canvas.width * 0.075; // Sesuai w-[85%] (Sisa 15% dibagi kiri-kanan)
-            const cropY = canvas.height * 0.42; // Menempatkan kotak pas di tengah-tengah vertikal
+            const cropX = canvas.width * 0.075; 
+            const cropY = canvas.height * 0.42; 
             const cropW = canvas.width * 0.85;
-            const cropH = canvas.height * 0.16; // Lebih tipis/pipih pas mengikuti rasio barcode
+            const cropH = canvas.height * 0.16; 
 
             const croppedCanvas = document.createElement('canvas');
             croppedCanvas.width = cropW; croppedCanvas.height = cropH;
             const croppedCtx = croppedCanvas.getContext('2d');
-            croppedCtx.filter = "grayscale(100%) contrast(190%)"; // Filter penajaman garis barcode
+            croppedCtx.filter = "grayscale(100%) contrast(180%)"; 
             croppedCtx.drawImage(canvas, cropX, cropY, cropW, cropH, 0, 0, cropW, cropH);
 
             try {
@@ -567,7 +561,7 @@
             } catch (e) {
                 console.error("Auto scan cycle skip/error:", e.message);
             } finally {
-                isProcessingOCR = false; // Buka kunci thread untuk perulangan selanjutnya
+                isProcessingOCR = false; 
             }
         }
 
@@ -627,7 +621,6 @@
 
             let logs = JSON.parse(localStorage.getItem('unified_scan_logs')) || [];
             
-            // Mencegah penumpukan riwayat jika kode yang sama ter-scan berturut-turut oleh loop otomatis
             if (logs.length > 0 && logs[0].code === code && logs[0].status === status) return;
 
             logs.unshift({ code, status, productName, time });
