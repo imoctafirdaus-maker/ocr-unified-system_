@@ -37,7 +37,7 @@
     <div id="barcode-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm">
         <div class="bg-white text-black p-6 rounded-2xl max-w-sm w-full shadow-2xl flex flex-col items-center relative border border-gray-200">
             <button onclick="window.closeBarcodeModal()" class="absolute top-3 right-4 text-gray-500 hover:text-black font-bold text-lg">✕</button>
-            <h3 class="text-blue-600 font-extrabold text-xl mb-4 tracking-wide font-sans">Code-93</h3>
+            <h3 class="text-blue-600 font-extrabold text-xl mb-4 tracking-wide font-sans">Barcode</h3>
             <div class="bg-white p-2 rounded flex justify-center items-center w-full overflow-hidden">
                 <svg id="barcode-canvas"></svg>
             </div>
@@ -392,7 +392,7 @@
             });
         };
 
-        // Mengubah Logika Fungsi untuk Memastikan Penemuan Elemen DOM Menggunakan Safe Jeda Waktu (Timeout)
+        // Modifikasi Format Menjadi CODE128 (Format Barcode Standar Linier Universal)
         window.openImagePopup = function(code) {
             const modal = document.getElementById('barcode-modal');
             const fallbackText = document.getElementById('barcode-text-fallback');
@@ -400,12 +400,11 @@
             modal.classList.remove('hidden');
             fallbackText.innerText = code;
             
-            // Jeda 50ms memberikan kesempatan browser merender kontainer modal dan SVG ke layar
             setTimeout(() => {
                 try {
-                    // Menggunakan format CODE128/Auto agar fleksibel membaca variasi panjang digit (4D, 6D, 8D, 12D) secara akurat
+                    // Mengubah format secara eksplisit menjadi CODE128 untuk menjamin gambar garis-garis barcode keluar sempurna
                     JsBarcode("#barcode-canvas", code, {
-                        format: "auto",
+                        format: "CODE128",
                         width: 2,
                         height: 75,
                         displayValue: false,
