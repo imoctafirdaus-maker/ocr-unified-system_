@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Enterprise Material PWA - POS & WMS v2.0</title>
+    <title>Enterprise Material PWA - SAP Restaurant POS Edition</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1565C0">
+    <meta name="theme-color" content="#F59E0B">
     <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2311/2311545.png">
     
+    <!-- Tailwind CSS Engine & SAP Restaurant Theme Configuration -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -15,20 +16,21 @@
             theme: {
                 extend: {
                     colors: {
-                        industrial: {
+                        sap: {
                             canvas: '#FFFFFF',
-                            bgLight: '#F5F7FA',
-                            primary: '#1565C0',
-                            navy: '#0A192F',
-                            slate: '#4A5568',
-                            success: '#2E7D32',
-                            warning: '#EF6C00',
-                            error: '#C62828'
+                            bgLight: '#F9FAFB',
+                            primary: '#F59E0B', /* Kuning Mustard Premium SAP FnB */
+                            primaryHover: '#D97706',
+                            navy: '#1E1E24', /* Hitam Charcoal Kontras Tinggi */
+                            slate: '#6B7280',
+                            success: '#10B981',
+                            warning: '#F59E0B',
+                            error: '#EF4444'
                         }
                     },
                     boxShadow: {
-                        enterprise: '0 4px 12px -1px rgba(10, 25, 47, 0.04), 0 2px 4px -1px rgba(10, 25, 47, 0.02)',
-                        premium: '0 20px 40px -5px rgba(10, 25, 47, 0.1)'
+                        enterprise: '0 4px 10px -1px rgba(30, 30, 36, 0.05), 0 2px 4px -1px rgba(30, 30, 36, 0.02)',
+                        premium: '0 20px 40px -5px rgba(30, 30, 36, 0.1)'
                     }
                 }
             }
@@ -47,170 +49,186 @@
         body { -webkit-tap-highlight-color: transparent; }
     </style>
 </head>
-<body class="bg-industrial-bgLight text-industrial-navy font-sans min-h-screen pb-24 transition-colors duration-200">
+<body class="bg-sap-bgLight text-sap-navy font-sans min-h-screen pb-24 transition-colors duration-200">
 
-    <nav id="global-navbar" class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 py-3 fixed left-0 right-0 top-0 z-40 shadow-sm">
+    <!-- GLOBAL ENTERPRISE TOP APP BAR -->
+    <nav id="global-navbar" class="bg-sap-navy text-white px-4 py-3 fixed left-0 right-0 top-0 z-40 shadow-md">
         <div class="flex justify-between items-center max-w-7xl mx-auto">
             <div class="flex items-center gap-3" onclick="navigateTo('pos')">
-                <div class="p-2 bg-industrial-primary/10 rounded-xl text-industrial-primary font-bold">🏭</div>
+                <div class="p-2 bg-sap-primary text-sap-navy rounded-xl font-black text-sm">🍳</div>
                 <div>
-                    <span class="font-black text-xs tracking-wider text-industrial-primary uppercase block">MATERIAL LOGISTIC ERP</span>
-                    <span id="nav-session-role" class="text-[10px] text-industrial-slate font-bold block">Developer Mode Active</span>
+                    <span class="font-black text-xs tracking-wider text-sap-primary uppercase block">SAP MATERIAL RESTO POS</span>
+                    <span id="nav-session-role" class="text-[10px] text-sap-slate font-bold block">Terminal Kasir #01 - Active</span>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button id="theme-toggle" onclick="toggleDarkMode()" class="text-industrial-slate p-2 rounded-xl text-xs bg-industrial-bgLight dark:bg-slate-800">🌙</button>
-                <span id="global-sync-badge" class="text-[9px] font-black px-2.5 py-1 rounded-full bg-emerald-50 text-industrial-success border border-emerald-200 uppercase tracking-wider">CLOUD CONNECTED</span>
+                <button id="theme-toggle" onclick="toggleDarkMode()" class="text-white p-2 rounded-xl text-xs bg-slate-800">🌙</button>
+                <span id="global-sync-badge" class="text-[9px] font-black px-2.5 py-1 rounded-full bg-emerald-500 text-sap-navy uppercase tracking-wider">SAP CLOUD SYNC</span>
             </div>
         </div>
     </nav>
 
+    <!-- MAIN CORE SCREEN AREA -->
     <div class="pt-16 px-4 max-w-7xl mx-auto">
 
+        <!-- ================= LAYER 1: POS KASIR ================= -->
         <section id="screen-pos" class="hidden space-y-4 animate-fade-in">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                <!-- Kiri: Katalog & Pencarian Menu Material -->
                 <div class="lg:col-span-2 space-y-3">
                     <div class="bg-white dark:bg-slate-800 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-enterprise flex gap-2">
-                        <input type="text" id="pos-search-input" oninput="renderPosCatalogHTML()" placeholder="Cari material cepat berdasarkan nama / SKU..." class="w-full p-2.5 bg-industrial-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none">
+                        <input type="text" id="pos-search-input" oninput="renderPosCatalogHTML()" placeholder="Ketik nama item atau ketuk kode numerik material..." class="w-full p-2.5 bg-sap-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs font-bold focus:outline-none focus:border-sap-primary">
                     </div>
-                    <div id="pos-catalog-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[50vh] overflow-y-auto pr-1"></div>
+                    <div id="pos-catalog-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 max-h-[52vh] overflow-y-auto pr-1"></div>
                 </div>
-                <div class="lg:col-span-1 bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-enterprise flex flex-col justify-between min-h-[60vh]">
+                <!-- Kanan: SAP Billing Station Restoran Layout -->
+                <div class="lg:col-span-1 bg-sap-navy text-white p-4 rounded-2xl border border-slate-800 shadow-premium flex flex-col justify-between min-h-[62vh]">
                     <div>
-                        <div class="flex justify-between items-center border-b pb-2 mb-3">
-                            <h4 class="text-xs font-black uppercase tracking-wider text-industrial-primary">Keranjang Item Penjualan</h4>
-                            <button onclick="clearPosCart()" class="text-[10px] text-industrial-error font-bold uppercase hover:underline">Clear</button>
+                        <div class="flex justify-between items-center border-b border-slate-700 pb-2.5 mb-3">
+                            <h4 class="text-xs font-black uppercase tracking-wider text-sap-primary">Struk Order / Keranjang Transaksi</h4>
+                            <button onclick="clearPosCart()" class="text-[10px] text-sap-error font-bold uppercase hover:underline">Clear All</button>
                         </div>
-                        <div id="pos-cart-items" class="space-y-2 max-h-[30vh] overflow-y-auto divide-y divide-slate-100 dark:divide-slate-700 pr-1"></div>
+                        <div id="pos-cart-items" class="space-y-2 max-h-[32vh] overflow-y-auto divide-y divide-slate-800 pr-1"></div>
                     </div>
                     
-                    <div class="border-t pt-3 mt-4 space-y-2 text-xs">
-                        <div class="flex justify-between text-industrial-slate"><span>Subtotal Item</span><span id="cart-subtotal" class="font-mono font-bold">Rp 0</span></div>
-                        <div class="flex justify-between text-industrial-slate"><span>Pajak (PPN 11%)</span><span id="cart-tax" class="font-mono font-bold">Rp 0</span></div>
-                        <div class="flex justify-between items-baseline border-t pt-2 text-industrial-navy dark:text-white">
-                            <span class="font-black">TOTAL AKHIR</span><span id="cart-total" class="text-xl font-black font-mono text-industrial-primary">Rp 0</span>
+                    <div class="border-t border-slate-700 pt-3 mt-4 space-y-2 text-xs">
+                        <div class="flex justify-between text-slate-400"><span>Subtotal Order</span><span id="cart-subtotal" class="font-mono font-bold text-white">Rp 0</span></div>
+                        <div class="flex justify-between text-slate-400"><span>Pajak Resto & Material (11%)</span><span id="cart-tax" class="font-mono font-bold text-white">Rp 0</span></div>
+                        <div class="flex justify-between items-baseline border-t border-slate-700 pt-2.5 text-white">
+                            <span class="font-black text-sap-primary">TOTAL BILL</span><span id="cart-total" class="text-2xl font-black font-mono text-sap-primary">Rp 0</span>
                         </div>
                         
-                        <div class="grid grid-cols-3 gap-2 pt-2">
-                            <button onclick="executePaymentCheckout('Tunai')" class="p-2 bg-emerald-600 text-white font-bold rounded-lg text-[10px] uppercase shadow-sm">💵 Tunai</button>
-                            <button onclick="executePaymentCheckout('Transfer')" class="p-2 bg-blue-600 text-white font-bold rounded-lg text-[10px] uppercase shadow-sm">🏦 Bank</button>
-                            <button onclick="executePaymentCheckout('QRIS')" class="p-2 bg-purple-600 text-white font-bold rounded-lg text-[10px] uppercase shadow-sm">📱 QRIS</button>
+                        <!-- Pilihan Metode Pembayaran Finansial -->
+                        <div class="grid grid-cols-3 gap-2 pt-3">
+                            <button onclick="executePaymentCheckout('Tunai')" class="p-3 bg-sap-primary hover:bg-sap-primaryHover text-sap-navy font-black rounded-xl text-[10px] uppercase shadow-md transition">💵 Cash</button>
+                            <button onclick="executePaymentCheckout('Transfer')" class="p-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl text-[10px] uppercase shadow-md transition">🏦 Bank</button>
+                            <button onclick="executePaymentCheckout('QRIS')" class="p-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl text-[10px] uppercase shadow-md transition">📱 QRIS</button>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
+        <!-- ================= LAYER 2: SCAN CENTER ================= -->
         <section id="screen-scan" class="hidden max-w-md mx-auto space-y-4 animate-fade-in">
-            <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border border-slate-800 shadow-2xl">
+            <div class="relative w-full aspect-video bg-black rounded-2xl overflow-hidden border-4 border-sap-navy shadow-2xl">
                 <video id="video" autoplay playsinline class="w-full h-full object-cover"></video>
-                <div id="focus-area" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-14 border-2 border-industrial-primary rounded-xl shadow-[0_0_0_9999px_rgba(10,25,47,0.75)] pointer-events-none">
-                    <div class="laser-line absolute left-0 right-0 h-[2px] bg-sky-400 shadow-[0_0_12px_#1565C0]"></div>
-                    <span id="focus-area-label" class="absolute -bottom-5 left-0 right-0 text-center text-[8px] uppercase font-black text-industrial-primary tracking-widest">MODE: POS AUTO ROUTE</span>
+                <div id="focus-area" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] h-14 border-2 border-sap-primary rounded-xl shadow-[0_0_0_9999px_rgba(30,30,36,0.8)] pointer-events-none">
+                    <div class="laser-line absolute left-0 right-0 h-[2px] bg-sap-primary shadow-[0_0_12px_#F59E0B]"></div>
+                    <span id="focus-area-label" class="absolute -bottom-5 left-0 right-0 text-center text-[8px] uppercase font-black text-sap-primary tracking-widest">MODE: POS AUTO ROUTE</span>
                 </div>
             </div>
-            <div class="p-3.5 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-enterprise flex justify-between items-center text-xs">
+            <div class="p-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-enterprise flex justify-between items-center text-xs">
                 <div class="flex items-center gap-2">
-                    <span class="animate-ping w-2 h-2 rounded-full bg-industrial-success"></span>
-                    <span id="scanner-status-text" class="font-mono font-bold text-industrial-slate dark:text-slate-400">Membaca matriks data lapangan...</span>
+                    <span class="animate-pulse w-2 h-2 rounded-full bg-sap-primary"></span>
+                    <span id="scanner-status-text" class="font-mono font-bold text-sap-navy dark:text-slate-400">Membaca data kode matriks...</span>
                 </div>
             </div>
         </section>
 
+        <!-- ================= LAYER 3: INVENTORY WMS ================= -->
         <section id="screen-inventory" class="hidden space-y-4 animate-fade-in">
             <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-enterprise flex flex-col sm:flex-row justify-between items-center gap-3">
                 <div>
-                    <h3 class="text-sm font-black uppercase tracking-wider text-industrial-navy dark:text-white">Warehouse Stock Management</h3>
-                    <p class="text-xs text-industrial-slate dark:text-slate-400">Kelola kuantitas inbound, outbound, dan stock opname material.</p>
+                    <h3 class="text-sm font-black uppercase tracking-wider text-sap-navy dark:text-white">SAP Stock Adjustment Station</h3>
+                    <p class="text-xs text-sap-slate dark:text-slate-400">Kelola kuantitas mutasi masuk dan keluar gudang material.</p>
                 </div>
-                <button id="ocr-toggle-btn" onclick="toggleOcrInventoryMode()" class="px-5 py-3 bg-slate-100 dark:bg-slate-900 text-industrial-slate font-black text-xs uppercase tracking-wider rounded-xl border border-slate-300 dark:border-slate-700 transition active:scale-95">
+                <!-- Tombol Saklar Wajib Mode OCR Inventory -->
+                <button id="ocr-toggle-btn" onclick="toggleOcrInventoryMode()" class="px-5 py-3 bg-sap-navy text-sap-primary font-black text-xs uppercase tracking-wider rounded-xl border-2 border-sap-primary transition active:scale-95">
                     ❌ MODE OCR INVENTORY: NONAKTIF
                 </button>
             </div>
 
-            <div id="inventory-edit-card" class="hidden max-w-md mx-auto bg-white dark:bg-slate-800 p-5 rounded-2xl border-2 border-industrial-primary shadow-premium space-y-4">
+            <!-- Interaksi Kuantitas Stok Opname -->
+            <div id="inventory-edit-card" class="hidden max-w-md mx-auto bg-white dark:bg-slate-800 p-5 rounded-2xl border-2 border-sap-primary shadow-premium space-y-4">
                 <div class="border-b pb-2">
-                    <span class="text-[9px] font-black uppercase bg-industrial-primary/10 text-industrial-primary px-2 py-0.5 rounded">Target Adjuster</span>
-                    <h4 id="inv-card-name" class="font-black text-sm text-industrial-navy dark:text-white mt-1">-</h4>
-                    <p id="inv-card-code" class="text-xs font-mono font-bold text-industrial-slate mt-0.5"></p>
+                    <span class="text-[9px] font-black uppercase bg-sap-primary text-sap-navy px-2 py-0.5 rounded">Target Adjuster</span>
+                    <h4 id="inv-card-name" class="font-black text-sm text-sap-navy dark:text-white mt-1">-</h4>
+                    <p id="inv-card-code" class="text-xs font-mono font-bold text-sap-slate mt-0.5"></p>
                 </div>
-                <div class="flex justify-between items-center bg-industrial-bgLight dark:bg-slate-900 p-3 rounded-xl">
-                    <span class="text-xs font-bold text-industrial-slate">Stok Saat Ini</span>
-                    <span id="inv-card-current-stock" class="text-lg font-black font-mono text-industrial-navy dark:text-white">0</span>
+                <div class="flex justify-between items-center bg-sap-bgLight dark:bg-slate-900 p-3 rounded-xl">
+                    <span class="text-xs font-bold text-sap-slate">Stok Saat Ini</span>
+                    <span id="inv-card-current-stock" class="text-lg font-black font-mono text-sap-navy dark:text-white">0</span>
                 </div>
                 <div class="grid grid-cols-2 gap-2">
-                    <button onclick="executeStockAdjustment(1)" class="p-3 bg-industrial-success text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-sm">+ Tambah Stok (Inbound)</button>
-                    <button onclick="executeStockAdjustment(-1)" class="p-3 bg-industrial-error text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-sm">- Kurangi Stok (Outbound)</button>
+                    <button onclick="executeStockAdjustment(1)" class="p-3 bg-sap-primary text-sap-navy font-black text-xs uppercase tracking-wider rounded-xl shadow-sm">+ Tambah Stok</button>
+                    <button onclick="executeStockAdjustment(-1)" class="p-3 bg-sap-navy text-white font-black text-xs uppercase tracking-wider rounded-xl shadow-sm">- Kurangi Stok</button>
                 </div>
             </div>
 
+            <!-- Log Audit Perubahan Mutasi Gudang -->
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-enterprise space-y-2">
-                <h4 class="text-xs font-black uppercase text-industrial-navy dark:text-white tracking-wide border-b pb-1.5">Riwayat Mutasi & Audit Log Gudang Hari Ini</h4>
+                <h4 class="text-xs font-black uppercase text-sap-navy dark:text-white tracking-wide border-b pb-1.5">Riwayat Mutasi & Audit Log Gudang</h4>
                 <div id="wms-audit-container" class="space-y-2 divide-y divide-slate-100 dark:divide-slate-700 max-h-40 overflow-y-auto pr-1"></div>
             </div>
         </section>
 
+        <!-- ================= LAYER 4: MANAGEMENT SYSTEM ================= -->
         <section id="screen-management" class="hidden space-y-4 animate-fade-in">
+            <!-- Gate Perlindungan Password Akses -->
             <div id="mgmt-password-gate" class="max-w-md mx-auto bg-white dark:bg-slate-800 p-6 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-enterprise space-y-4 text-center">
                 <div class="text-3xl">🔐</div>
                 <div>
-                    <h4 class="font-black text-sm text-industrial-navy dark:text-white">Otorisasi Manajemen Diperlukan</h4>
-                    <p class="text-xs text-industrial-slate dark:text-slate-400">Masukkan sandi otentikasi supervisor sistem ERP.</p>
+                    <h4 class="font-black text-sm text-sap-navy dark:text-white">Otorisasi Manajemen Diperlukan</h4>
+                    <p class="text-xs text-sap-slate dark:text-slate-400">Masukkan sandi otentikasi supervisor sistem ERP SAP.</p>
                 </div>
-                <input type="password" id="mgmt-password-input" placeholder="Password default: user" class="w-full p-2.5 bg-industrial-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-center font-mono focus:outline-none">
-                <button onclick="verifyManagementPassword()" class="w-full p-2.5 bg-industrial-primary text-white font-black text-xs uppercase tracking-wider rounded-xl active:scale-95 transition shadow-md">Verifikasi Otoritas</button>
+                <input type="password" id="mgmt-password-input" placeholder="Password default: user" class="w-full p-2.5 bg-sap-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl text-xs text-center font-mono focus:outline-none focus:border-sap-primary">
+                <button onclick="verifyManagementPassword()" class="w-full p-2.5 bg-sap-primary text-sap-navy font-black text-xs uppercase tracking-wider rounded-xl active:scale-95 transition shadow-md">Verifikasi Otoritas</button>
             </div>
 
+            <!-- Dashboard Internal Utama Manajemen Proyek -->
             <div id="mgmt-main-dashboard" class="hidden space-y-5">
+                <!-- Statistik Finansial & Operasional Massal -->
                 <div class="grid grid-cols-2 lg:grid-cols-4 gap-3.5">
                     <div class="p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-enterprise">
-                        <p class="text-[9px] font-bold text-industrial-slate uppercase tracking-widest">Total SKU Barang</p>
-                        <h3 id="m-total-sku" class="text-xl font-black mt-1 text-industrial-navy dark:text-white">0</h3>
+                        <p class="text-[9px] font-bold text-sap-slate uppercase tracking-widest">Total Master SKU</p>
+                        <h3 id="m-total-sku" class="text-xl font-black mt-1 text-sap-navy dark:text-white">0</h3>
                     </div>
                     <div class="p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-enterprise">
-                        <p class="text-[9px] font-bold text-industrial-slate uppercase tracking-widest">Total Kuantitas Stok</p>
-                        <h3 id="m-total-stock" class="text-xl font-black mt-1 text-industrial-primary">0</h3>
+                        <p class="text-[9px] font-bold text-sap-slate uppercase tracking-widest">Total Kuantitas Stok</p>
+                        <h3 id="m-total-stock" class="text-xl font-black mt-1 text-sap-primary">0</h3>
                     </div>
                     <div class="p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-enterprise">
-                        <p class="text-[9px] font-bold text-industrial-slate uppercase tracking-widest">Omset Penjualan POS</p>
-                        <h3 id="m-total-revenue" class="text-xl font-black mt-1 text-industrial-success font-mono">Rp 0</h3>
+                        <p class="text-[9px] font-bold text-sap-slate uppercase tracking-widest">Omset Penjualan POS</p>
+                        <h3 id="m-total-revenue" class="text-xl font-black mt-1 text-emerald-600 font-mono">Rp 0</h3>
                     </div>
                     <div class="p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-enterprise">
-                        <p class="text-[9px] font-bold text-industrial-slate uppercase tracking-widest">Barang Terlaris</p>
-                        <h3 class="text-xs font-black mt-1 text-industrial-warning truncate">Baja H-Beam 150</h3>
+                        <p class="text-[9px] font-bold text-sap-slate uppercase tracking-widest">Terminal Status</p>
+                        <h3 class="text-xs font-black mt-1 text-sap-primary uppercase tracking-wider">SAP RESTO CONNECTED</h3>
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+                    <!-- CRUD Input Form & Pembuat Kode Otomatis -->
                     <div class="lg:col-span-1 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-enterprise space-y-4">
-                        <h4 class="text-xs font-black uppercase text-industrial-primary tracking-wide border-b pb-2">Master Data Barang</h4>
+                        <h4 class="text-xs font-black uppercase text-sap-primary tracking-wide border-b pb-2">Master Data SKU Barang</h4>
                         <form id="mgmt-product-form" class="space-y-3.5 text-xs">
                             <div>
-                                <label class="block font-bold text-industrial-slate mb-1">Nama Barang</label>
-                                <input type="text" id="m-name" required class="w-full p-2 bg-industrial-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none">
+                                <label class="block font-bold text-sap-slate mb-1">Nama Barang</label>
+                                <input type="text" id="m-name" required class="w-full p-2 bg-sap-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-sap-primary">
                             </div>
                             <div>
-                                <label class="block font-bold text-industrial-slate mb-1">Harga Barang (Rp)</label>
-                                <input type="number" id="m-price" required class="w-full p-2 bg-industrial-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none">
+                                <label class="block font-bold text-sap-slate mb-1">Harga Barang (Rp)</label>
+                                <input type="number" id="m-price" required class="w-full p-2 bg-sap-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-sap-primary">
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block font-bold text-industrial-slate mb-1">Kategori</label>
-                                    <input type="text" id="m-category" required value="Logam" class="w-full p-2 bg-industrial-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none">
+                                    <label class="block font-bold text-sap-slate mb-1">Kategori</label>
+                                    <input type="text" id="m-category" required value="Logam" class="w-full p-2 bg-sap-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-sap-primary">
                                 </div>
                                 <div>
-                                    <label class="block font-bold text-industrial-slate mb-1">Satuan</label>
-                                    <input type="text" id="m-unit" required value="Batang" class="w-full p-2 bg-industrial-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none">
+                                    <label class="block font-bold text-sap-slate mb-1">Satuan</label>
+                                    <input type="text" id="m-unit" required value="Batang" class="w-full p-2 bg-sap-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-sap-primary">
                                 </div>
                             </div>
                             <div class="grid grid-cols-2 gap-2">
                                 <div>
-                                    <label class="block font-bold text-industrial-slate mb-1">Lokasi Rak</label>
-                                    <input type="text" id="m-location" required value="Gudang A / Rak 01" class="w-full p-2 bg-industrial-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none">
+                                    <label class="block font-bold text-sap-slate mb-1">Lokasi Rak</label>
+                                    <input type="text" id="m-location" required value="Gudang A / Rak 01" class="w-full p-2 bg-sap-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-sap-primary">
                                 </div>
                                 <div>
-                                    <label class="block font-bold text-industrial-slate mb-1">Status</label>
-                                    <select id="m-status" class="w-full p-2 bg-industrial-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none font-bold">
+                                    <label class="block font-bold text-sap-slate mb-1">Status</label>
+                                    <select id="m-status" class="w-full p-2 bg-sap-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none font-bold">
                                         <option value="Tersedia">Tersedia</option>
                                         <option value="Stok Menipis">Stok Menipis</option>
                                         <option value="Habis">Habis</option>
@@ -218,24 +236,26 @@
                                 </div>
                             </div>
                             <div>
-                                <label class="block font-bold text-industrial-slate mb-1">Supplier Utama Vendor</label>
-                                <input type="text" id="m-supplier" required value="PT Krakatau Steel" class="w-full p-2 bg-industrial-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none">
+                                <label class="block font-bold text-sap-slate mb-1">Supplier Utama Vendor</label>
+                                <input type="text" id="m-supplier" required value="PT Krakatau Steel" class="w-full p-2 bg-sap-bgLight dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:border-sap-primary">
                             </div>
                             
-                            <button type="submit" class="w-full p-3 bg-industrial-primary text-white font-black uppercase tracking-wider rounded-xl">Simpan SKU & Auto Gen Kode</button>
+                            <button type="submit" class="w-full p-3 bg-sap-primary text-sap-navy font-black uppercase tracking-wider rounded-xl">Simpan SKU & Auto Gen Kode</button>
                         </form>
 
+                        <!-- Fitur Gacha Code Generator Massal -->
                         <div class="border-t pt-3 space-y-2">
-                            <h5 class="text-[10px] font-black uppercase tracking-wider text-amber-500">Gacha Engine Massal</h5>
+                            <h5 class="text-[10px] font-black uppercase tracking-wider text-amber-600">Gacha Engine Massal</h5>
                             <button onclick="executeGachaRandomBatch()" class="w-full p-2.5 bg-amber-500 text-white font-black text-[10px] uppercase tracking-widest rounded-xl shadow-md">🎰 [ GENERATE RANDOM CODE ]</button>
                         </div>
                     </div>
 
+                    <!-- Tabel Monitoring Cloud Inventaris Master -->
                     <div class="lg:col-span-2 bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-enterprise overflow-hidden flex flex-col">
-                        <h4 class="text-xs font-black uppercase text-industrial-navy dark:text-white tracking-wide mb-3">Tabel Kontrol Inventaris Cloud</h4>
+                        <h4 class="text-xs font-black uppercase text-sap-navy dark:text-white tracking-wide mb-3">Tabel Kontrol Inventaris Cloud</h4>
                         <div class="overflow-x-auto rounded-xl border border-slate-200 shadow-inner">
                             <table class="w-full text-left text-xs border-collapse">
-                                <thead class="bg-slate-50 border-b uppercase font-black text-slate-400">
+                                <thead class="bg-sap-navy text-white uppercase font-black tracking-wider">
                                     <tr>
                                         <th class="p-3 text-[10px]">Kode Numerik</th>
                                         <th class="p-3 text-[10px]">Nama Barang</th>
@@ -253,19 +273,21 @@
 
     </div>
 
-    <nav id="global-bottom-nav" class="bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 fixed bottom-0 left-0 right-0 z-40 shadow-lg transition-colors duration-200">
-        <div class="grid grid-cols-4 max-w-lg mx-auto text-center py-2 text-[10px] font-black tracking-wide text-industrial-slate">
-            <button onclick="navigateTo('pos')" id="nav-tab-pos" class="space-y-1 py-1 text-industrial-primary"><span class="text-lg block">💵</span><span>POS KASIR</span></button>
+    <!-- GLOBAL ENTERPRISE SYSTEM BOTTOM NAVIGATION BAR MENU -->
+    <nav id="global-bottom-nav" class="bg-sap-navy border-t border-slate-800 fixed bottom-0 left-0 right-0 z-40 shadow-lg">
+        <div class="grid grid-cols-4 max-w-lg mx-auto text-center py-2 text-[10px] font-black tracking-wide text-slate-400">
+            <button onclick="navigateTo('pos')" id="nav-tab-pos" class="space-y-1 py-1 text-sap-primary"><span class="text-lg block">💵</span><span>POS KASIR</span></button>
             <button onclick="navigateTo('scan')" id="nav-tab-scan" class="space-y-1 py-1"><span class="text-lg block">📷</span><span>SCAN</span></button>
             <button onclick="navigateTo('inventory')" id="nav-tab-inventory" class="space-y-1 py-1"><span class="text-lg block">📦</span><span>INVENTORY</span></button>
             <button onclick="navigateTo('management')" id="nav-tab-management" class="space-y-1 py-1"><span class="text-lg block">⚙️</span><span>MANAGEMENT</span></button>
         </div>
     </nav>
 
+    <!-- RENDER MODAL POPUP VISUAL BARCODE GAMBAR -->
     <div id="barcode-modal" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
         <div class="bg-white p-6 rounded-2xl max-w-sm w-full shadow-2xl flex flex-col items-center relative border border-slate-100">
             <button onclick="window.closeBarcodeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-800 transition font-bold text-lg">✕</button>
-            <h3 class="text-industrial-primary font-black text-sm mb-4 tracking-wider uppercase">Linear Barcode (CODE128)</h3>
+            <h3 class="text-sap-navy font-black text-sm mb-4 tracking-wider uppercase">Linear Barcode (CODE128)</h3>
             <div class="bg-slate-50 p-4 rounded-xl flex justify-center items-center w-full border border-slate-200">
                 <svg id="barcode-canvas"></svg>
             </div>
@@ -273,11 +295,12 @@
         </div>
     </div>
 
+    <!-- MAIN MODULE ENGINE SCRIPT CORE -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
         import { getFirestore, collection, doc, setDoc, onSnapshot, getDoc, deleteDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-        // KREDENSIAL API FIREBASE ASLI PROYEK ANDA
+        // KREDENSIAL API FIREBASE ASLI PROYEK ANDA (system-a35d6)
         const firebaseConfig = {
             apiKey: "AIzaSyCvli9t-p4rdfQb8IPYfQu7g2PeUuxqZ1Y",
             authDomain: "system-a35d6.firebaseapp.com",
@@ -301,7 +324,7 @@
         let liveRadarIntervalLoop = null;
         let isEngineProcessingThread = false;
         let activePageID = 'pos';
-        let isOcrInventoryModeActive = false; // Toggle wajib status OCR Inventory
+        let isOcrInventoryModeActive = false; 
         let isManagementUnlocked = false;
 
         // ================= REAL-TIME DATABASE SYNCHRONIZER =================
@@ -332,8 +355,8 @@
             tabs.forEach(t => {
                 const el = document.getElementById(`nav-tab-${t}`);
                 if (el) {
-                    if (t === screenID) el.className = "space-y-1 py-1 text-industrial-primary";
-                    else el.className = "space-y-1 py-1 text-industrial-slate";
+                    if (t === screenID) el.className = "space-y-1 py-1 text-sap-primary";
+                    else el.className = "space-y-1 py-1 text-slate-400";
                 }
             });
 
@@ -406,14 +429,12 @@
                     if (navigator.vibrate) navigator.vibrate(100);
                     statusBar.innerText = `Terdeteksi: ${cleanCode}`;
                     
-                    // PROSES ROUTING DATA INTEGRASI INTEGRATED OCR
                     let target = cloudProductsMaster.find(x => x.code === cleanCode);
                     if (!target) {
-                        target = { code: cleanCode, name: `Material Auto SKU-${cleanCode}`, price: 85000, category: "Logam", stock: 50, location: "Gudang Utama", supplier: "Mitra Industri", unit: "Pcs", status: "Tersedia" };
+                        target = { code: cleanCode, name: `Material Auto SKU-${cleanCode}`, price: 85000, category: "Logam", stock: 50, location: "Gudang Utama", supplier: "Mitra Resto", unit: "Pcs", status: "Tersedia" };
                     }
 
                     if (isOcrInventoryModeActive) {
-                        // Alur OCR Inventory Mode Active
                         document.getElementById('inventory-edit-card').classList.remove('hidden');
                         document.getElementById('inv-card-name').innerText = target.name;
                         document.getElementById('inv-card-code').innerText = `SKU: ${target.code}`;
@@ -421,9 +442,8 @@
                         window.activeInventoryTargetCode = target.code;
                         navigateTo('inventory');
                     } else {
-                        // Alur POS Kasir Default Auto Route
                         addMaterialToPosCart(target);
-                        alert(`Barang [${target.name}] otomatis masuk ke keranjang POS.`);
+                        alert(`Barang [${target.name}] otomatis masuk ke order POS Resto.`);
                         navigateTo('pos');
                     }
                 }
@@ -439,17 +459,17 @@
             const filtered = cloudProductsMaster.filter(x => x.name.toLowerCase().includes(searchVal) || x.code.includes(searchVal));
             
             if (filtered.length === 0) {
-                grid.innerHTML = `<p class="text-xs text-industrial-slate p-4 col-span-3 text-center">SKU belum terdaftar di Firestore.</p>`;
+                grid.innerHTML = `<p class="text-xs text-sap-slate p-4 col-span-3 text-center">Item tidak tersedia di SAP Cloud.</p>`;
                 return;
             }
 
             filtered.forEach(item => {
                 grid.innerHTML += `
-                    <div onclick="window.addMaterialToPosCartByID('${item.code}')" class="p-3 bg-white border rounded-xl hover:border-industrial-primary shadow-sm cursor-pointer transition select-none">
-                        <span class="text-[8px] font-mono font-bold bg-slate-100 text-industrial-slate px-1.5 py-0.5 rounded uppercase">${item.category}</span>
-                        <h5 class="font-black text-xs text-industrial-navy mt-1 truncate">${item.name}</h5>
-                        <p class="text-emerald-600 font-mono font-black text-xs mt-1">Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>
-                        <p class="text-[9px] text-industrial-slate mt-0.5">Stok: ${item.stock || 0} ${item.unit || 'Pcs'}</p>
+                    <div onclick="window.addMaterialToPosCartByID('${item.code}')" class="p-3 bg-white dark:bg-slate-800 border-2 border-transparent hover:border-sap-primary shadow-enterprise rounded-xl cursor-pointer transition select-none active:scale-95">
+                        <span class="text-[8px] font-mono font-black bg-sap-primary text-sap-navy px-1.5 py-0.5 rounded uppercase tracking-wider">${item.category}</span>
+                        <h5 class="font-black text-xs text-sap-navy dark:text-white mt-1 truncate">${item.name}</h5>
+                        <p class="text-sap-primary font-mono font-black text-xs mt-1">Rp ${parseInt(item.price).toLocaleString('id-ID')}</p>
+                        <p class="text-[9px] text-sap-slate mt-0.5">Stok: ${item.stock || 0} ${item.unit || 'Pcs'}</p>
                     </div>`;
             });
         };
@@ -494,15 +514,15 @@
                 const totalItemPrice = item.price * item.qty;
                 subtotal += totalItemPrice;
                 container.innerHTML += `
-                    <div class="flex justify-between items-center py-2 text-xs font-mono">
-                        <div class="max-w-[60%]">
-                            <span class="font-bold text-industrial-navy block truncate">${item.name}</span>
-                            <span class="text-[10px] text-industrial-slate block">@ Rp ${parseInt(item.price).toLocaleString('id-ID')}</span>
+                    <div class="flex justify-between items-center py-2.5 text-xs font-mono border-b border-slate-800 last:border-none">
+                        <div class="max-w-[55%]">
+                            <span class="font-black text-sap-primary block truncate">${item.name}</span>
+                            <span class="text-[10px] text-slate-400 block">@ Rp ${parseInt(item.price).toLocaleString('id-ID')}</span>
                         </div>
                         <div class="flex items-center gap-2">
-                            <button onclick="window.updateCartQty('${item.code}', -1)" class="w-5 h-5 bg-slate-100 rounded font-bold text-center">-</button>
-                            <span class="font-black">${item.qty}</span>
-                            <button onclick="window.updateCartQty('${item.code}', 1)" class="w-5 h-5 bg-slate-100 rounded font-bold text-center">+</button>
+                            <button onclick="window.updateCartQty('${item.code}', -1)" class="w-6 h-6 bg-slate-800 text-sap-primary border border-slate-700 rounded-lg font-black text-center">-</button>
+                            <span class="font-black text-white px-1">${item.qty}</span>
+                            <button onclick="window.updateCartQty('${item.code}', 1)" class="w-6 h-6 bg-slate-800 text-sap-primary border border-slate-700 rounded-lg font-black text-center">+</button>
                         </div>
                     </div>`;
             });
@@ -517,11 +537,9 @@
         }
 
         window.executePaymentCheckout = function(method) {
-            if (posShoppingCart.length === 0) return alert("Keranjang belanja masih kosong.");
-            
+            if (posShoppingCart.length === 0) return alert("Keranjang order kosong.");
             const totalFinal = window.currentCartTotalCalculation;
-            alert(`Transaksi Berhasil Disimpan!\nMetode: ${method}\nTotal Manifest: Rp ${totalFinal.toLocaleString('id-ID')}\nStruk thermal berhasil dicetak via bluetooth.`);
-            
+            alert(`Resi Penjualan SAP Berhasil Disimpan!\nMetode: ${method}\nTotal Bill: Rp ${totalFinal.toLocaleString('id-ID')}\nStruk kasir restoran berhasil dicetak.`);
             posTransactionsHistory.push({ total: totalFinal, timestamp: new Date().toLocaleTimeString('id-ID') });
             clearPosCart();
         };
@@ -534,12 +552,12 @@
             
             if (isOcrInventoryModeActive) {
                 btn.innerText = "✅ MODE OCR INVENTORY: AKTIF";
-                btn.className = "px-5 py-3 bg-industrial-success text-white font-black text-xs uppercase tracking-wider rounded-xl transition active:scale-95";
+                btn.className = "px-5 py-3 bg-sap-primary text-sap-navy font-black text-xs uppercase tracking-wider rounded-xl transition active:scale-95";
                 label.innerText = "MODE: INVENTORY ROUTE";
-                alert("Radar Scanner sekarang dialihkan khusus untuk memutasi stok Inventory gudang.");
+                alert("Scanner dialihkan ke penyesuaian stok gudang SAP.");
             } else {
                 btn.innerText = "❌ MODE OCR INVENTORY: NONAKTIF";
-                btn.className = "px-5 py-3 bg-slate-100 dark:bg-slate-900 text-industrial-slate font-black text-xs uppercase tracking-wider rounded-xl border border-slate-300 dark:border-slate-700 transition active:scale-95";
+                btn.className = "px-5 py-3 bg-sap-navy text-sap-primary font-black text-xs uppercase tracking-wider rounded-xl border-2 border-sap-primary transition active:scale-95";
                 label.innerText = "MODE: POS AUTO ROUTE";
             }
         };
@@ -548,7 +566,7 @@
             const code = window.activeInventoryTargetCode;
             if (!code) return;
 
-            const qtyInput = prompt("Masukkan kuantitas perubahan barang (Inbound/Outbound):", "10");
+            const qtyInput = prompt("Masukkan kuantitas mutasi stok:", "10");
             if (!qtyInput) return;
 
             const val = parseInt(qtyInput) * factor;
@@ -556,10 +574,9 @@
             let currentStock = match ? parseInt(match.stock || 50) : 50;
             let newStock = currentStock + val;
 
-            if (newStock < 0) return alert("Transaksi batal, mutasi outbound melebihi batas stok fisik.");
+            if (newStock < 0) return alert("Mutasi gagal, kuantitas tidak mencukupi.");
 
             try {
-                // Tulis perubahan ke Cloud Firestore
                 await setDoc(doc(db, "products", code), {
                     code: code,
                     name: match ? match.name : `Material Auto SKU-${code}`,
@@ -567,7 +584,7 @@
                     category: match ? match.category : "Logam",
                     stock: newStock,
                     location: match ? match.location : "Gudang A",
-                    supplier: match ? match.supplier : "Mitra Industri",
+                    supplier: match ? match.supplier : "Mitra Resto",
                     unit: match ? match.unit : "Pcs",
                     status: newStock <= 5 ? "Stok Menipis" : "Tersedia"
                 }, { merge: true });
@@ -577,7 +594,7 @@
                 });
                 renderInventoryAuditLogsHTML();
                 document.getElementById('inventory-edit-card').classList.add('hidden');
-                alert("Cloud Firestore Berhasil Dimutasi.");
+                alert("Cloud SAP database berhasil diperbarui.");
             } catch (e) { alert(e.message); }
         };
 
@@ -585,15 +602,15 @@
             const container = document.getElementById('wms-audit-container');
             container.innerHTML = '';
             if (inventoryAuditLogs.length === 0) {
-                container.innerHTML = `<p class="text-[10px] text-industrial-slate text-center py-3">Belum ada mutasi stok terdaftar hari ini.</p>`;
+                container.innerHTML = `<p class="text-[10px] text-sap-slate text-center py-3">Belum ada audit perubahan.</p>`;
                 return;
             }
             inventoryAuditLogs.forEach(l => {
                 container.innerHTML += `
                     <div class="flex justify-between items-center py-2 text-xs font-mono">
-                        <span>SKU Ref: <b class="text-industrial-primary">${l.code}</b></span>
-                        <span class="font-black ${parseInt(l.val) > 0 ? 'text-industrial-success':'text-industrial-error'}">${l.val} item</span>
-                        <span class="text-[10px] text-industrial-slate">${l.time}</span>
+                        <span>SKU Ref: <b class="text-sap-primary">${l.code}</b></span>
+                        <span class="font-black ${parseInt(l.val) > 0 ? 'text-emerald-500':'text-sap-error'}">${l.val} item</span>
+                        <span class="text-[10px] text-sap-slate">${l.time}</span>
                     </div>`;
             });
         }
@@ -607,7 +624,7 @@
                 document.getElementById('mgmt-main-dashboard').classList.remove('hidden');
                 renderManagementTablesHTML();
             } else {
-                alert("Akses Ditolak: Kredensial password manajemen salah.");
+                alert("Akses Ditolak: Kode otorisasi salah.");
             }
         };
 
@@ -629,12 +646,12 @@
             cloudProductsMaster.forEach(item => {
                 tbody.innerHTML += `
                     <tr class="text-[11px] font-mono border-b">
-                        <td class="p-2.5 font-bold text-industrial-primary">${item.code}</td>
-                        <td class="p-2.5 font-sans font-bold text-industrial-navy">${item.name}</td>
-                        <td class="p-2.5 font-black text-industrial-success">Rp ${parseInt(item.price).toLocaleString('id-ID')}</td>
+                        <td class="p-2.5 font-bold text-sap-primary">${item.code}</td>
+                        <td class="p-2.5 font-sans font-bold text-sap-navy">${item.name}</td>
+                        <td class="p-2.5 font-black text-emerald-600">Rp ${parseInt(item.price).toLocaleString('id-ID')}</td>
                         <td class="p-2.5 text-center flex justify-center gap-1">
                             <button onclick="window.openImagePopup('${item.code}')" class="p-1 bg-slate-100 border text-[10px]">🖼️</button>
-                            <button onclick="window.deleteProductCloud('${item.code}')" class="px-2 py-1 bg-industrial-error text-white font-bold rounded">Hapus</button>
+                            <button onclick="window.deleteProductCloud('${item.code}')" class="px-2 py-1 bg-sap-error text-white font-bold rounded">Hapus</button>
                         </td>
                     </tr>`;
             });
@@ -650,25 +667,23 @@
             const status = document.getElementById('m-status').value;
             const supplier = document.getElementById('m-supplier').value.trim();
 
-            // PROSES PEMBUATAN KODE NUMERIK OTOMATIS (8 DIGIT UNIK DAN READABLE BARCODE)
             const generatedCode = generateNumericID(8);
 
             try {
                 await setDoc(doc(db, "products", generatedCode), {
                     code: generatedCode, name, price, category, unit, location, status, supplier, stock: 100
                 });
-                alert(`SKU Berhasil Dibuat!\nKode Numerik: ${generatedCode}\nBarcode CODE128 & QR Code Otomatis Terintegrasi Cloud.`);
+                alert(`Master SKU Berhasil Disimpan!\nKode: ${generatedCode}`);
                 document.getElementById('mgmt-product-form').reset();
             } catch (err) { alert(err.message); }
         });
 
         window.deleteProductCloud = async function(code) {
-            if (confirm(`Hapus permanen kode SKU ${code} dari Firestore Cloud?`)) {
+            if (confirm(`Hapus permanen kode SKU ${code}?`)) {
                 await deleteDoc(doc(db, "products", code));
             }
         };
 
-        // FITUR GACHA CODE GENERATOR MASSAL (BATAS SAFETY TRANSKASI MAKSIMAL 500 SKU)
         window.executeGachaRandomBatch = async function() {
             const batch = writeBatch(db);
             const generatedCodesList = [];
@@ -686,21 +701,26 @@
             }
 
             await batch.commit();
-            alert(`🎰 GACHA ENGINE SUCCESS!\nKode Terinjeksi Cloud Firestore:\n[${generatedCodesList.join(" | ")}]\nBebas Duplikasi & Validasi 100% Ok.`);
+            alert(`🎰 GACHA BATCH SUCCESS!\nInjeksi Kode:\n[${generatedCodesList.join(" | ")}]`);
         };
+
+        function generateNumericID(length) {
+            let result = '';
+            const characters = '0123456789';
+            for (let i = 0; i < length; i++) result += characters.charAt(Math.floor(Math.random() * characters.length));
+            return result;
+        }
 
         window.closeBarcodeModal = function() {
             document.getElementById('barcode-modal').classList.add('hidden');
         };
 
-        // GLOBAL DARK MODE TOGGLE CONTROLLER
         window.toggleDarkMode = function() {
             document.documentElement.classList.toggle('dark');
             const currentMode = document.documentElement.classList.contains('dark');
             document.getElementById('theme-toggle').innerText = currentMode ? "☀️" : "🌙";
         };
 
-        // INITIALIZATION SEQUENCE SYSTEM
         window.addEventListener('DOMContentLoaded', () => {
             navigateTo('pos');
         });
