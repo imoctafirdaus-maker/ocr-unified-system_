@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Enterprise Material POS System</title>
+    <title>Enterprise Material POS System - Yellow Edition</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#1565C0">
+    <meta name="theme-color" content="#F59E0B">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- Tailwind CSS Production Engine -->
+    <!-- Tailwind CSS Production Engine with Yellow Palette Customization -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -17,19 +17,20 @@
                 extend: {
                     colors: {
                         pos: {
-                            canvas: '#FFFFFF',
-                            bgLight: '#F5F7FA',
-                            primary: '#1565C0',
-                            navy: '#0A192F',
-                            slate: '#4A5568',
-                            success: '#2E7D32',
-                            error: '#C62828',
-                            border: '#E2E8F0'
+                            canvas: '#FFFBEB', /* Kuning Lembut Lemas untuk Background */
+                            bgLight: '#FEF3C7', /* Kuning Muda Sekunder */
+                            primary: '#F59E0B', /* Kuning Pekat / Amber Utama */
+                            primaryHover: '#D97706',
+                            navy: '#000000', /* Teks Hitam Pekat */
+                            slate: '#4B5563', /* Abu-abu Gelap untuk Teks Sekunder */
+                            success: '#166534',
+                            error: '#991B1B',
+                            border: '#F3F4F6'
                         }
                     },
                     boxShadow: {
-                        enterprise: '0 2px 8px -1px rgba(10, 25, 47, 0.04), 0 1px 3px -1px rgba(10, 25, 47, 0.02)',
-                        dock: '0 -4px 16px -4px rgba(10, 25, 47, 0.08)'
+                        enterprise: '0 2px 8px -1px rgba(217, 119, 6, 0.08), 0 1px 3px -1px rgba(217, 119, 6, 0.04)',
+                        dock: '0 -4px 16px -4px rgba(217, 119, 6, 0.15)'
                     }
                 }
             }
@@ -41,18 +42,18 @@
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="bg-pos-bgLight text-pos-navy font-sans min-h-screen select-none">
+<body class="bg-[#FFFBEB] text-pos-navy font-sans min-h-screen select-none">
 
-    <!-- ================= SYSTEM HEADER STATIONS ================= -->
-    <nav class="bg-white border-b border-pos-border px-4 py-3 fixed left-0 right-0 top-0 z-40 shadow-sm">
+    <!-- ================= SYSTEM HEADER STATIONS (KUNING PEKAT) ================= -->
+    <nav class="bg-pos-primary border-b border-amber-600 px-4 py-3 fixed left-0 right-0 top-0 z-40 shadow-md">
         <div class="flex justify-between items-center max-w-7xl mx-auto text-xs">
             <div class="flex items-center gap-3">
                 <div>
-                    <span class="font-black text-pos-primary uppercase tracking-wider block">TOKO MATERIAL UTAMA</span>
-                    <span id="header-user-info" class="text-[10px] text-pos-slate font-bold block">KASIR: ADMINISTRATOR</span>
+                    <span class="font-black text-pos-navy uppercase tracking-wider block">TOKO MATERIAL UTAMA</span>
+                    <span id="header-user-info" class="text-[10px] text-pos-navy/80 font-bold block">KASIR: ADMINISTRATOR</span>
                 </div>
             </div>
-            <div class="text-right font-mono font-bold text-pos-slate space-y-0.5">
+            <div class="text-right font-mono font-bold text-pos-navy space-y-0.5">
                 <div class="flex items-center gap-2 justify-end">
                     <span class="w-2 h-2 rounded-full bg-pos-success"></span>
                     <span id="network-status" class="text-[10px] uppercase tracking-wide text-pos-success">ONLINE STATION</span>
@@ -68,60 +69,60 @@
         <!-- ================= PANEL LAYER 0: CENTRAL CORE DASHBOARD ================= -->
         <section id="view-dashboard" class="space-y-4 py-4 animate-fade-in">
             <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
-                <div onclick="navigateTo('pos-kasir')" class="bg-white p-5 rounded-xl border border-pos-border shadow-enterprise cursor-pointer hover:border-pos-primary transition active:scale-[0.98]">
-                    <h3 class="font-black text-xs uppercase tracking-wider text-pos-primary">POS KASIR</h3>
-                    <p class="text-[10px] text-pos-slate mt-1.5 font-medium">Transaksi Penjualan Baru</p>
+                <div onclick="navigateTo('pos-kasir')" class="bg-pos-primary p-5 rounded-xl border border-amber-500 shadow-enterprise cursor-pointer hover:bg-pos-primaryHover transition active:scale-[0.98]">
+                    <h3 class="font-black text-xs uppercase tracking-wider text-pos-navy">POS KASIR</h3>
+                    <p class="text-[10px] text-pos-navy/80 mt-1.5 font-bold">Transaksi Penjualan Baru</p>
                 </div>
-                <div onclick="navigateTo('transaksi')" class="bg-white p-5 rounded-xl border border-pos-border shadow-enterprise cursor-pointer hover:border-pos-primary transition active:scale-[0.98]">
+                <div onclick="navigateTo('transaksi')" class="bg-white p-5 rounded-xl border border-amber-200 shadow-enterprise cursor-pointer hover:border-pos-primary transition active:scale-[0.98]">
                     <h3 class="font-black text-xs uppercase tracking-wider text-pos-navy">TRANSAKSI</h3>
                     <p class="text-[10px] text-pos-slate mt-1.5 font-medium">Riwayat & Salinan Nota</p>
                 </div>
-                <div onclick="navigateTo('data-barang')" class="bg-white p-5 rounded-xl border border-pos-border shadow-enterprise cursor-pointer hover:border-pos-primary transition active:scale-[0.98]">
+                <div onclick="navigateTo('data-barang')" class="bg-white p-5 rounded-xl border border-amber-200 shadow-enterprise cursor-pointer hover:border-pos-primary transition active:scale-[0.98]">
                     <h3 class="font-black text-xs uppercase tracking-wider text-pos-navy">DATA BARANG</h3>
                     <p class="text-[10px] text-pos-slate mt-1.5 font-medium">Kontrol Master SKU & Stok</p>
                 </div>
-                <div onclick="navigateTo('laporan')" class="bg-white p-5 rounded-xl border border-pos-border shadow-enterprise cursor-pointer hover:border-pos-primary transition active:scale-[0.98]">
+                <div onclick="navigateTo('laporan')" class="bg-white p-5 rounded-xl border border-amber-200 shadow-enterprise cursor-pointer hover:border-pos-primary transition active:scale-[0.98]">
                     <h3 class="font-black text-xs uppercase tracking-wider text-pos-navy">LAPORAN</h3>
                     <p class="text-[10px] text-pos-slate mt-1.5 font-medium">Statistik Omset Toko</p>
                 </div>
-                <div onclick="navigateTo('pengaturan')" class="bg-white p-5 rounded-xl border border-pos-border shadow-enterprise cursor-pointer hover:border-pos-primary transition active:scale-[0.98]">
+                <div onclick="navigateTo('pengaturan')" class="bg-white p-5 rounded-xl border border-amber-200 shadow-enterprise cursor-pointer hover:border-pos-primary transition active:scale-[0.98]">
                     <h3 class="font-black text-xs uppercase tracking-wider text-pos-navy">PENGATURAN</h3>
                     <p class="text-[10px] text-pos-slate mt-1.5 font-medium">Konfigurasi Parameter</p>
                 </div>
             </div>
             
             <!-- Quick View Summary Logs -->
-            <div class="bg-white border border-pos-border rounded-xl p-4 shadow-enterprise space-y-3">
+            <div class="bg-white border border-amber-200 rounded-xl p-4 shadow-enterprise space-y-3">
                 <h4 class="text-[11px] font-black uppercase text-pos-navy tracking-wider border-b pb-2">Log Sesi Kasir Terakhir</h4>
-                <div id="dashboard-recent-activities" class="space-y-2 divide-y divide-slate-100 text-xs font-mono"></div>
+                <div id="dashboard-recent-activities" class="space-y-2 divide-y divide-amber-100 text-xs font-mono"></div>
             </div>
         </section>
 
         <!-- ================= PANEL LAYER 1: HALAMAN POS KASIR ================= -->
         <section id="view-pos-kasir" class="hidden space-y-3 py-2 flex-grow">
             <!-- Search Control Row -->
-            <div class="bg-white p-3 rounded-xl border border-pos-border shadow-enterprise flex gap-2">
-                <input type="text" id="pos-search-input" oninput="searchCatalogQuery()" placeholder="Cari material berdasarkan nama barang atau sku..." class="w-full p-2.5 bg-pos-bgLight border border-pos-border rounded-lg text-xs font-bold focus:outline-none focus:border-pos-primary">
-                <button onclick="openFormBarangModal()" class="px-4 py-2.5 bg-pos-primary text-white text-xs font-black uppercase tracking-wider rounded-lg active:scale-95 transition">Tambah Barang Baru</button>
+            <div class="bg-white p-3 rounded-xl border border-amber-200 shadow-enterprise flex gap-2">
+                <input type="text" id="pos-search-input" oninput="searchCatalogQuery()" placeholder="Cari material berdasarkan nama barang atau sku..." class="w-full p-2.5 bg-pos-canvas border border-amber-300 rounded-lg text-xs font-bold text-pos-navy focus:outline-none focus:border-pos-primary">
+                <button onclick="openFormBarangModal()" class="px-4 py-2.5 bg-pos-primary hover:bg-pos-primaryHover text-pos-navy text-xs font-black uppercase tracking-wider rounded-lg active:scale-95 transition">Tambah Barang Baru</button>
             </div>
 
             <!-- Split Grid Workspace -->
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <!-- Dropdown Pencarian Catalog List -->
-                <div class="lg:col-span-1 bg-white p-3 rounded-xl border border-pos-border shadow-enterprise flex flex-col max-h-[45vh]">
+                <div class="lg:col-span-1 bg-white p-3 rounded-xl border border-amber-200 shadow-enterprise flex flex-col max-h-[45vh]">
                     <h4 class="text-[10px] font-black uppercase tracking-wider text-pos-slate border-b pb-1.5 mb-2">Katalog Item Tersedia</h4>
                     <div id="pos-filtered-catalog" class="space-y-1 overflow-y-auto pr-1 flex-grow hide-scrollbar"></div>
                 </div>
 
                 <!-- Main Cart Manifest Table Station -->
-                <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-pos-border shadow-enterprise flex flex-col justify-between min-h-[45vh]">
+                <div class="lg:col-span-2 bg-white p-4 rounded-xl border border-amber-200 shadow-enterprise flex flex-col justify-between min-h-[45vh]">
                     <div class="w-full">
                         <div class="grid grid-cols-12 text-[10px] font-black text-pos-slate uppercase tracking-wider border-b pb-2 mb-2">
                             <div class="col-span-5">Deskripsi Material</div>
                             <div class="col-span-4 text-center">Kuantitas Order</div>
                             <div class="col-span-3 text-right">Subtotal Harga</div>
                         </div>
-                        <div id="pos-cart-manifest-rows" class="space-y-1.5 max-h-[30vh] overflow-y-auto pr-1 divide-y divide-slate-50 hide-scrollbar"></div>
+                        <div id="pos-cart-manifest-rows" class="space-y-1.5 max-h-[30vh] overflow-y-auto pr-1 divide-y divide-amber-50 hide-scrollbar"></div>
                     </div>
                 </div>
             </div>
@@ -129,90 +130,90 @@
 
         <!-- ================= PANEL LAYER 2: HALAMAN TRANSAKSI ================= -->
         <section id="view-transaksi" class="hidden space-y-4 py-2 animate-fade-in">
-            <div class="bg-white p-4 rounded-xl border border-pos-border shadow-enterprise flex flex-col sm:flex-row gap-3">
-                <input type="text" id="tx-search-input" oninput="renderTransactionHistoryList()" placeholder="Cari berdasarkan nomor nota transaksi..." class="w-full p-2.5 bg-pos-bgLight border border-pos-border rounded-lg text-xs font-bold focus:outline-none">
-                <input type="date" id="tx-filter-date" onchange="renderTransactionHistoryList()" class="p-2.5 bg-pos-bgLight border border-pos-border rounded-lg text-xs font-bold focus:outline-none">
+            <div class="bg-white p-4 rounded-xl border border-amber-200 shadow-enterprise flex flex-col sm:flex-row gap-3">
+                <input type="text" id="tx-search-input" oninput="renderTransactionHistoryList()" placeholder="Cari berdasarkan nomor nota transaksi..." class="w-full p-2.5 bg-pos-canvas border border-amber-300 rounded-lg text-xs font-bold focus:outline-none">
+                <input type="date" id="tx-filter-date" onchange="renderTransactionHistoryList()" class="p-2.5 bg-pos-canvas border border-amber-300 rounded-lg text-xs font-bold focus:outline-none">
             </div>
-            <div class="bg-white rounded-xl border border-pos-border shadow-enterprise overflow-hidden">
-                <div class="grid grid-cols-12 p-3.5 bg-slate-50 text-[10px] font-black text-pos-slate uppercase tracking-wider border-b">
+            <div class="bg-white rounded-xl border border-amber-200 shadow-enterprise overflow-hidden">
+                <div class="grid grid-cols-12 p-3.5 bg-amber-50 text-[10px] font-black text-pos-slate uppercase tracking-wider border-b">
                     <div class="col-span-3">No. Transaksi / Nota</div>
                     <div class="col-span-3">Waktu Penjualan</div>
                     <div class="col-span-3 text-center">Metode</div>
                     <div class="col-span-3 text-right">Total Akhir</div>
                 </div>
-                <div id="tx-history-container" class="divide-y divide-slate-100 font-mono text-xs"></div>
+                <div id="tx-history-container" class="divide-y divide-amber-100 font-mono text-xs"></div>
             </div>
         </section>
 
         <!-- ================= PANEL LAYER 3: HALAMAN DATA BARANG ================= -->
         <section id="view-data-barang" class="hidden space-y-4 py-2 animate-fade-in">
-            <div class="bg-white p-3.5 rounded-xl border border-pos-border shadow-enterprise flex justify-between items-center gap-3">
-                <input type="text" id="inventory-search-input" oninput="renderInventoryMasterTable()" placeholder="Cari nama barang atau nomor SKU..." class="w-full sm:w-72 p-2.5 bg-pos-bgLight border border-pos-border rounded-lg text-xs font-bold focus:outline-none">
-                <button onclick="openFormBarangModal()" class="px-5 py-2.5 bg-pos-primary text-white font-black text-xs uppercase tracking-wider rounded-lg">Tambah Item Baru</button>
+            <div class="bg-white p-3.5 rounded-xl border border-amber-200 shadow-enterprise flex justify-between items-center gap-3">
+                <input type="text" id="inventory-search-input" oninput="renderInventoryMasterTable()" placeholder="Cari nama barang atau nomor SKU..." class="w-full sm:w-72 p-2.5 bg-pos-canvas border border-amber-300 rounded-lg text-xs font-bold focus:outline-none">
+                <button onclick="openFormBarangModal()" class="px-5 py-2.5 bg-pos-primary hover:bg-pos-primaryHover text-pos-navy font-black text-xs uppercase tracking-wider rounded-lg">Tambah Item Baru</button>
             </div>
-            <div class="bg-white rounded-xl border border-pos-border shadow-enterprise overflow-hidden">
-                <div class="grid grid-cols-12 p-3.5 bg-slate-50 text-[10px] font-black text-pos-slate uppercase tracking-wider border-b">
+            <div class="bg-white rounded-xl border border-amber-200 shadow-enterprise overflow-hidden">
+                <div class="grid grid-cols-12 p-3.5 bg-amber-50 text-[10px] font-black text-pos-slate uppercase tracking-wider border-b">
                     <div class="col-span-5">Nama Material Deskripsi</div>
                     <div class="col-span-4">Harga Satuan ERP</div>
                     <div class="col-span-1 text-center">Stok</div>
                     <div class="col-span-2 text-center">Aksi Kontrol</div>
                 </div>
-                <div id="inventory-table-rows" class="divide-y divide-slate-100 text-xs"></div>
+                <div id="inventory-table-rows" class="divide-y divide-amber-100 text-xs"></div>
             </div>
         </section>
 
         <!-- ================= PANEL LAYER 4: HALAMAN LAPORAN ================= -->
         <section id="view-laporan" class="hidden space-y-5 py-2 animate-fade-in">
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
-                <div class="p-4 bg-white rounded-xl border border-pos-border shadow-enterprise">
+                <div class="p-4 bg-white rounded-xl border border-amber-200 shadow-enterprise">
                     <span class="text-[9px] font-black text-pos-slate uppercase tracking-widest block">Omset Hari Ini</span>
                     <h3 id="rep-omset-hari-ini" class="text-lg font-black font-mono text-pos-success mt-1">Rp 0</h3>
                 </div>
-                <div class="p-4 bg-white rounded-xl border border-pos-border shadow-enterprise">
+                <div class="p-4 bg-white rounded-xl border border-amber-200 shadow-enterprise">
                     <span class="text-[9px] font-black text-pos-slate uppercase tracking-widest block">Omset Mingguan</span>
-                    <h3 id="rep-omset-mingguan" class="text-lg font-black font-mono text-pos-primary mt-1">Rp 0</h3>
+                    <h3 id="rep-omset-mingguan" class="text-lg font-black font-mono text-pos-navy mt-1">Rp 0</h3>
                 </div>
-                <div class="p-4 bg-white rounded-xl border border-pos-border shadow-enterprise">
+                <div class="p-4 bg-white rounded-xl border border-amber-200 shadow-enterprise">
                     <span class="text-[9px] font-black text-pos-slate uppercase tracking-widest block">Omset Bulanan</span>
                     <h3 id="rep-omset-bulanan" class="text-lg font-black font-mono text-pos-navy mt-1">Rp 0</h3>
                 </div>
-                <div class="p-4 bg-white rounded-xl border border-pos-border shadow-enterprise">
+                <div class="p-4 bg-white rounded-xl border border-amber-200 shadow-enterprise">
                     <span class="text-[9px] font-black text-pos-slate uppercase tracking-widest block">Volume Penjualan</span>
                     <h3 id="rep-total-transaksi" class="text-lg font-black font-mono text-pos-navy mt-1">0 Nota</h3>
                 </div>
             </div>
             
-            <div class="bg-white p-5 rounded-xl border border-pos-border shadow-enterprise space-y-3">
+            <div class="bg-white p-5 rounded-xl border border-amber-200 shadow-enterprise space-y-3">
                 <h4 class="text-xs font-black uppercase text-pos-navy tracking-wider border-b pb-2">Rangking Material Terlaris (Top Selling)</h4>
-                <div id="rep-top-items-list" class="space-y-2 divide-y divide-slate-100 text-xs font-mono"></div>
+                <div id="rep-top-items-list" class="space-y-2 divide-y divide-amber-100 text-xs font-mono"></div>
             </div>
         </section>
 
         <!-- ================= PANEL LAYER 5: HALAMAN PENGATURAN ================= -->
         <section id="view-pengaturan" class="hidden max-w-xl mx-auto space-y-4 py-2 animate-fade-in text-xs">
-            <div class="bg-white p-5 rounded-xl border border-pos-border shadow-enterprise space-y-4">
+            <div class="bg-white p-5 rounded-xl border border-amber-200 shadow-enterprise space-y-4">
                 <h4 class="text-xs font-black uppercase text-pos-navy tracking-wider border-b pb-2">Konfigurasi Toko & Keuangan</h4>
                 <div class="grid grid-cols-2 gap-4">
                     <div>
                         <label class="block font-bold text-pos-slate mb-1">Pajak Toko (PPN %)</label>
-                        <input type="number" id="cfg-tax-rate" value="11" oninput="saveGlobalConfigurationData()" class="w-full p-2 bg-pos-bgLight border rounded-lg focus:outline-none">
+                        <input type="number" id="cfg-tax-rate" value="11" oninput="saveGlobalConfigurationData()" class="w-full p-2 bg-pos-canvas border rounded-lg focus:outline-none">
                     </div>
                     <div>
                         <label class="block font-bold text-pos-slate mb-1">Diskon Global Penjualan (%)</label>
-                        <input type="number" id="cfg-discount-rate" value="0" oninput="saveGlobalConfigurationData()" class="w-full p-2 bg-pos-bgLight border rounded-lg focus:outline-none">
+                        <input type="number" id="cfg-discount-rate" value="0" oninput="saveGlobalConfigurationData()" class="w-full p-2 bg-pos-canvas border rounded-lg focus:outline-none">
                     </div>
                 </div>
                 <div>
                     <label class="block font-bold text-pos-slate mb-1">Nama Profil Toko</label>
-                    <input type="text" id="cfg-store-name" value="TOKO MATERIAL UTAMA" oninput="saveGlobalConfigurationData()" class="w-full p-2 bg-pos-bgLight border rounded-lg focus:outline-none">
+                    <input type="text" id="cfg-store-name" value="TOKO MATERIAL UTAMA" oninput="saveGlobalConfigurationData()" class="w-full p-2 bg-pos-canvas border rounded-lg focus:outline-none">
                 </div>
             </div>
             
-            <div class="bg-white p-5 rounded-xl border border-pos-border shadow-enterprise space-y-3">
+            <div class="bg-white p-5 rounded-xl border border-amber-200 shadow-enterprise space-y-3">
                 <h4 class="text-xs font-black uppercase text-pos-navy tracking-wider border-b pb-2">Data Engine Integrity (Backup/Restore)</h4>
                 <div class="grid grid-cols-2 gap-3">
-                    <button onclick="executeDataBackupDownload()" class="p-3 bg-slate-100 border border-pos-border font-black text-center rounded-lg uppercase tracking-wider hover:bg-slate-200">Backup Internal Data</button>
-                    <button onclick="executeDataRestoreUpload()" class="p-3 bg-slate-100 border border-pos-border font-black text-center rounded-lg uppercase tracking-wider hover:bg-slate-200">Restore File Data</button>
+                    <button onclick="executeDataBackupDownload()" class="p-3 bg-pos-canvas border border-amber-300 font-black text-center rounded-lg uppercase tracking-wider hover:bg-amber-100">Backup Internal Data</button>
+                    <button onclick="executeDataRestoreUpload()" class="p-3 bg-pos-canvas border border-amber-300 font-black text-center rounded-lg uppercase tracking-wider hover:bg-amber-100">Restore File Data</button>
                 </div>
             </div>
         </section>
@@ -220,26 +221,26 @@
     </div>
 
     <!-- ================= PERSISTENT BOTTOM LOCK ORDER SUMMARY WINDOW ================= -->
-    <div id="bottom-dock-summary" class="hidden bg-white border-t border-pos-border fixed bottom-14 left-0 right-0 z-40 shadow-dock p-4">
+    <div id="bottom-dock-summary" class="hidden bg-white border-t border-amber-200 fixed bottom-14 left-0 right-0 z-40 shadow-dock p-4">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 text-xs">
             <div class="grid grid-cols-4 gap-4 sm:flex sm:gap-6 font-mono text-pos-slate">
                 <div><span class="text-[9px] block uppercase font-bold">Subtotal</span><span id="dock-subtotal" class="font-bold text-pos-navy">Rp 0</span></div>
                 <div><span class="text-[9px] block uppercase font-bold">Diskon</span><span id="dock-discount" class="font-bold text-pos-error">Rp 0</span></div>
                 <div><span class="text-[9px] block uppercase font-bold">Pajak (PPN)</span><span id="dock-tax" class="font-bold text-pos-navy">Rp 0</span></div>
-                <div><span class="text-[9px] block uppercase font-bold text-pos-primary">Grand Total</span><span id="dock-grand-total" class="text-lg font-black text-pos-primary">Rp 0</span></div>
+                <div><span class="text-[9px] block uppercase font-bold text-pos-primary">Grand Total</span><span id="dock-grand-total" class="text-lg font-black text-pos-navy">Rp 0</span></div>
             </div>
-            <button onclick="triggerPaymentModalPopup()" class="px-8 py-3.5 bg-pos-primary hover:bg-blue-700 text-white font-black uppercase tracking-widest rounded-xl shadow-md transition active:scale-[0.99] text-center">PROSES PEMBAYARAN</button>
+            <button onclick="triggerPaymentModalPopup()" class="px-8 py-3.5 bg-pos-primary hover:bg-pos-primaryHover text-pos-navy font-black uppercase tracking-widest rounded-xl shadow-md transition active:scale-[0.99] text-center">PROSES PEMBAYARAN</button>
         </div>
     </div>
 
-    <!-- GLOBAL INDUSTRIAL NAVIGATION MENU SHORTCUTS BAR -->
-    <nav class="bg-pos-navy border-t border-slate-800 fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
-        <div class="grid grid-cols-5 max-w-lg mx-auto text-center py-2.5 text-[10px] font-black tracking-wider text-slate-400">
-            <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="space-y-0.5 text-white">HOME</button>
-            <button onclick="navigateTo('pos-kasir')" id="nav-pos-kasir" class="space-y-0.5">POS</button>
-            <button onclick="navigateTo('transaksi')" id="nav-transaksi" class="space-y-0.5">HISTORY</button>
-            <button onclick="navigateTo('data-barang')" id="nav-data-barang" class="space-y-0.5">ITEMS</button>
-            <button onclick="navigateTo('laporan')" id="nav-laporan" class="space-y-0.5">REPORTS</button>
+    <!-- GLOBAL INDUSTRIAL NAVIGATION MENU SHORTCUTS BAR (KUNING PEKAT) -->
+    <nav class="bg-pos-primary border-t border-amber-600 fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
+        <div class="grid grid-cols-5 max-w-lg mx-auto text-center py-2.5 text-[10px] font-black tracking-wider text-pos-navy">
+            <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="space-y-0.5 text-pos-navy">HOME</button>
+            <button onclick="navigateTo('pos-kasir')" id="nav-pos-kasir" class="space-y-0.5 opacity-60">POS</button>
+            <button onclick="navigateTo('transaksi')" id="nav-transaksi" class="space-y-0.5 opacity-60">HISTORY</button>
+            <button onclick="navigateTo('data-barang')" id="nav-data-barang" class="space-y-0.5 opacity-60">ITEMS</button>
+            <button onclick="navigateTo('laporan')" id="nav-laporan" class="space-y-0.5 opacity-60">REPORTS</button>
         </div>
     </nav>
 
@@ -247,29 +248,29 @@
     <div id="modal-payment" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/70">
         <div class="bg-white p-5 rounded-xl max-w-md w-full shadow-2xl space-y-4 text-xs">
             <div class="flex justify-between items-center border-b pb-2">
-                <h3 class="font-black text-pos-primary uppercase tracking-wider">Finalisasi Pembayaran Bill</h3>
+                <h3 class="font-black text-pos-navy uppercase tracking-wider">Finalisasi Pembayaran Bill</h3>
                 <button onclick="closePaymentModalPopup()" class="text-pos-slate font-bold text-sm">BATAL</button>
             </div>
-            <div class="space-y-1.5 bg-pos-bgLight p-3 rounded-lg font-mono">
+            <div class="space-y-1.5 bg-pos-canvas p-3 rounded-lg font-mono">
                 <div class="flex justify-between text-pos-slate"><span>Total Tagihan Belanja</span><span id="pay-modal-total-label" class="font-black text-pos-navy">Rp 0</span></div>
             </div>
             <div class="space-y-2">
                 <label class="block font-black uppercase text-[10px] text-pos-slate tracking-wide">Pilih Instrumen Metode Pembayaran</label>
                 <div class="grid grid-cols-3 gap-2">
-                    <button onclick="selectPaymentMethod('Tunai')" id="pay-method-Tunai" class="p-2.5 bg-pos-primary text-white font-black uppercase rounded-lg text-center">Tunai</button>
-                    <button onclick="selectPaymentMethod('Transfer')" id="pay-method-Transfer" class="p-2.5 bg-slate-100 font-bold uppercase rounded-lg text-center">Transfer</button>
-                    <button onclick="selectPaymentMethod('QRIS')" id="pay-method-QRIS" class="p-2.5 bg-slate-100 font-bold uppercase rounded-lg text-center">QRIS</button>
+                    <button onclick="selectPaymentMethod('Tunai')" id="pay-method-Tunai" class="p-2.5 bg-pos-primary text-pos-navy font-black uppercase rounded-lg text-center">Tunai</button>
+                    <button onclick="selectPaymentMethod('Transfer')" id="pay-method-Transfer" class="p-2.5 bg-amber-100 text-pos-navy font-bold uppercase rounded-lg text-center">Transfer</button>
+                    <button onclick="selectPaymentMethod('QRIS')" id="pay-method-QRIS" class="p-2.5 bg-amber-100 text-pos-navy font-bold uppercase rounded-lg text-center">QRIS</button>
                 </div>
             </div>
             <div id="cash-input-group" class="space-y-2">
                 <label class="block font-black uppercase text-[10px] text-pos-slate tracking-wide">Nominal Uang Tunai Diterima (Rp)</label>
-                <input type="number" id="pay-cash-received" oninput="calculateCashReturnCalculation()" class="w-full p-3 bg-pos-bgLight border rounded-lg font-mono text-sm font-black focus:outline-none">
-                <div class="flex justify-between p-2.5 bg-slate-50 border rounded-lg font-mono font-bold">
+                <input type="number" id="pay-cash-received" oninput="calculateCashReturnCalculation()" class="w-full p-3 bg-pos-canvas border border-amber-300 rounded-lg font-mono text-sm font-black text-pos-navy focus:outline-none">
+                <div class="flex justify-between p-2.5 bg-amber-50 border rounded-lg font-mono font-bold">
                     <span class="text-pos-slate">Uang Kembalian Pelanggan</span>
                     <span id="pay-cash-return-label" class="text-pos-navy">Rp 0</span>
                 </div>
             </div>
-            <button onclick="submitFinalTransactionReceipt()" class="w-full py-3 bg-pos-success text-white font-black uppercase tracking-widest rounded-lg shadow-md transition">SELESAIKAN TRANSAKSI PENJUALAN</button>
+            <button onclick="submitFinalTransactionReceipt()" class="w-full py-3 bg-pos-primary hover:bg-pos-primaryHover text-pos-navy font-black uppercase tracking-widest rounded-lg shadow-md transition">SELESAIKAN TRANSAKSI PENJUALAN</button>
         </div>
     </div>
 
@@ -284,17 +285,17 @@
                 <input type="hidden" id="form-barang-id">
                 <div>
                     <label class="block font-bold text-pos-slate mb-1">Nama Deskripsi Material</label>
-                    <input type="text" id="form-barang-name" required class="w-full p-2 bg-pos-bgLight border rounded-lg focus:outline-none">
+                    <input type="text" id="form-barang-name" required class="w-full p-2 bg-pos-canvas border rounded-lg focus:outline-none">
                 </div>
                 <div>
                     <label class="block font-bold text-pos-slate mb-1">Harga Eceran Toko (Rp)</label>
-                    <input type="number" id="form-barang-price" required class="w-full p-2 bg-pos-bgLight border rounded-lg focus:outline-none">
+                    <input type="number" id="form-barang-price" required class="w-full p-2 bg-pos-canvas border rounded-lg focus:outline-none">
                 </div>
                 <div>
                     <label class="block font-bold text-pos-slate mb-1">Kuantitas Stok Fisik Awal</label>
-                    <input type="number" id="form-barang-stock" required class="w-full p-2 bg-pos-bgLight border rounded-lg focus:outline-none">
+                    <input type="number" id="form-barang-stock" required class="w-full p-2 bg-pos-canvas border rounded-lg focus:outline-none">
                 </div>
-                <button type="submit" class="w-full py-2.5 bg-pos-primary text-white font-black uppercase tracking-wider rounded-lg shadow">Simpan ke Master Database</button>
+                <button type="submit" class="w-full py-2.5 bg-pos-primary hover:bg-pos-primaryHover text-pos-navy font-black uppercase tracking-wider rounded-lg shadow">Simpan ke Master Database</button>
             </form>
         </div>
     </div>
@@ -328,7 +329,6 @@
             document.getElementById(`view-${viewID}`).classList.remove('hidden');
             currentActiveViewID = viewID;
 
-            // Saklar otomatis penampilan Summary Dock Kasir di bagian bawah layar
             const summaryDock = document.getElementById('bottom-dock-summary');
             if (viewID === 'pos-kasir') {
                 summaryDock.classList.remove('hidden');
@@ -338,17 +338,15 @@
                 summaryDock.classList.add('hidden');
             }
 
-            // Manajemen Style Menu Bar Bottom Active State
             const menus = ['dashboard', 'pos-kasir', 'transaksi', 'data-barang', 'laporan'];
             menus.forEach(m => {
                 const targetEl = document.getElementById(`nav-${m}`);
                 if (targetEl) {
-                    if (m === viewID) targetEl.className = "space-y-0.5 text-white font-black";
-                    else targetEl.className = "space-y-0.5 text-slate-400 font-bold";
+                    if (m === viewID) targetEl.classList.remove('opacity-60');
+                    else targetEl.classList.add('opacity-60');
                 }
             });
 
-            // Trigger pemuatan data internal view
             if (viewID === 'transaksi') renderTransactionHistoryList();
             else if (viewID === 'data-barang') renderInventoryMasterTable();
             else if (viewID === 'laporan') renderStatisticalReportDashboard();
@@ -372,7 +370,6 @@
             systemConfiguration.tax = parseFloat(document.getElementById('cfg-tax-rate').value) || 0;
             systemConfiguration.discount = parseFloat(document.getElementById('cfg-discount-rate').value) || 0;
             systemConfiguration.store = document.getElementById('cfg-store-name').value || "TOKO MATERIAL UTAMA";
-            document.getElementById('cfg-store-name').value = systemConfiguration.store;
             commitDatabaseChangesToStorage();
             renderCalculationTotalsSummary();
         };
@@ -386,12 +383,12 @@
             const matches = localInventoryDatabase.filter(x => x.name.toLowerCase().includes(query) || x.id.includes(query));
             matches.forEach(item => {
                 container.innerHTML += `
-                    <div onclick="addMaterialToCartRow('${item.id}')" class="p-2.5 bg-slate-50 border rounded-lg hover:border-pos-primary cursor-pointer transition flex justify-between items-center">
+                    <div onclick="addMaterialToCartRow('${item.id}')" class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg hover:border-pos-primary cursor-pointer transition flex justify-between items-center">
                         <div class="max-w-[70%]">
                             <span class="font-bold text-pos-navy block truncate">${item.name}</span>
                             <span class="text-[10px] font-mono text-pos-slate block">SKU: ${item.id} • Stok: ${item.stock}</span>
                         </div>
-                        <span class="font-mono font-black text-pos-primary text-[11px]">Rp ${item.price.toLocaleString('id-ID')}</span>
+                        <span class="font-mono font-black text-pos-navy text-[11px]">Rp ${item.price.toLocaleString('id-ID')}</span>
                     </div>`;
             });
         };
@@ -399,7 +396,7 @@
         window.addMaterialToCartRow = function(id) {
             const item = localInventoryDatabase.find(x => x.id === id);
             if (!item) return;
-            if (item.stock <= 0) { alert("Mutasi Batal: Batas stok fisik material di gudang habis."); return; }
+            if (item.stock <= 0) { alert("Mutasi Batal: Batas stok fisik material habis."); return; }
 
             const exist = posActiveCartRows.find(x => x.id === id);
             if (exist) {
@@ -450,7 +447,7 @@
             container.innerHTML = '';
 
             if (posActiveCartRows.length === 0) {
-                container.innerHTML = `<p class="text-center font-medium italic text-pos-slate py-8">Keranjang kasir kosong. Silakan pilih material dari katalog.</p>`;
+                container.innerHTML = `<p class="text-center font-medium italic text-pos-slate py-8">Keranjang kasir kosong.</p>`;
                 renderCalculationTotalsSummary();
                 return;
             }
@@ -464,11 +461,11 @@
                             <span class="text-[10px] text-pos-slate block">@ Rp ${row.price.toLocaleString('id-ID')}</span>
                         </div>
                         <div class="col-span-4 flex items-center justify-center gap-1.5">
-                            <button onclick="updateCartRowQuantity('${row.id}', -1)" class="w-5 h-5 bg-slate-100 font-bold border rounded text-center">-</button>
-                            <span onclick="manualEditCartQuantity('${row.id}')" class="font-black px-1.5 cursor-pointer underline text-pos-primary">${row.qty}</span>
-                            <button onclick="updateCartRowQuantity('${row.id}', 1)" class="w-5 h-5 bg-slate-100 font-bold border rounded text-center">+</button>
+                            <button onclick="updateCartRowQuantity('${row.id}', -1)" class="w-5 h-5 bg-amber-100 font-bold border border-amber-300 rounded text-center text-pos-navy">-</button>
+                            <span onclick="manualEditCartQuantity('${row.id}')" class="font-black px-1.5 cursor-pointer underline text-pos-navy">${row.qty}</span>
+                            <button onclick="updateCartRowQuantity('${row.id}', 1)" class="w-5 h-5 bg-amber-100 font-bold border border-amber-300 rounded text-center text-pos-navy">+</button>
                         </div>
-                        <div class="col-span-3 text-right font-black flex items-center justify-end gap-2">
+                        <div class="col-span-3 text-right font-black flex items-center justify-end gap-2 text-pos-navy">
                             <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
                             <span onclick="removeMaterialFromCartRow('${row.id}')" class="text-pos-error font-sans font-bold cursor-pointer text-[10px] uppercase ml-1">Hapus</span>
                         </div>
@@ -510,8 +507,8 @@
             const methods = ['Tunai', 'Transfer', 'QRIS'];
             methods.forEach(m => {
                 const el = document.getElementById(`pay-method-${m}`);
-                if (m === method) el.className = "p-2.5 bg-pos-primary text-white font-black uppercase rounded-lg text-center";
-                else el.className = "p-2.5 bg-slate-100 font-bold uppercase rounded-lg text-center";
+                if (m === method) el.className = "p-2.5 bg-pos-primary text-pos-navy font-black uppercase rounded-lg text-center";
+                else el.className = "p-2.5 bg-amber-100 text-pos-navy font-bold uppercase rounded-lg text-center";
             });
 
             const cashGroup = document.getElementById('cash-input-group');
@@ -547,7 +544,6 @@
                 if (cashReceived < totalBill) { alert("Transaksi Batal: Nominal pembayaran kurang."); return; }
             }
 
-            // Generate Manifest Nota Unik Model TrackCust Jtm
             const receiptID = "TX-" + Date.now().toString().substring(5, 13);
             const dateObj = new Date();
 
@@ -560,7 +556,6 @@
                 items: [...posActiveCartRows]
             };
 
-            // Potong Stok Gudang Secara Real-Time
             posActiveCartRows.forEach(cartItem => {
                 const targetMaster = localInventoryDatabase.find(x => x.id === cartItem.id);
                 if (targetMaster) targetMaster.stock -= cartItem.qty;
@@ -569,7 +564,7 @@
             localTransactionsHistory.unshift(txLogItem);
             commitDatabaseChangesToStorage();
 
-            alert(`Nota ${receiptID} Sukses Disimpan!\nPerubahan kuantitas stok fisik berhasil disinkronkan.`);
+            alert(`Nota ${receiptID} Sukses Disimpan!`);
             posActiveCartRows = [];
             closePaymentModalPopup();
             navigateTo('transaksi');
@@ -589,22 +584,22 @@
             });
 
             if (filtered.length === 0) {
-                container.innerHTML = `<p class="p-4 text-center font-medium italic text-pos-slate">Tidak ada berkas manifes penjualan yang cocok.</p>`;
+                container.innerHTML = `<p class="p-4 text-center font-medium italic text-pos-slate">Tidak ada berkas manifes penjualan.</p>`;
                 return;
             }
 
             filtered.forEach(tx => {
                 container.innerHTML += `
-                    <div onclick="alert('Detail Material Order:\\n${tx.items.map(i=>'- '+i.name+' x'+i.qty).join('\\n')}')" class="grid grid-cols-12 p-3.5 items-center hover:bg-slate-50 border-b cursor-pointer last:border-none">
-                        <div class="col-span-3 font-bold text-pos-primary">${tx.id}</div>
+                    <div onclick="alert('Detail Material Order:\\n${tx.items.map(i=>'- '+i.name+' x'+i.qty).join('\\n')}')" class="grid grid-cols-12 p-3.5 items-center hover:bg-amber-50 border-b border-amber-100 cursor-pointer last:border-none">
+                        <div class="col-span-3 font-bold text-pos-navy">${tx.id}</div>
                         <div class="col-span-3 text-pos-slate">${tx.date} • ${tx.time}</div>
-                        <div class="col-span-3 text-center"><span class="px-2 py-0.5 bg-slate-100 font-sans font-black uppercase tracking-wide rounded text-[9px]">${tx.method}</span></div>
+                        <div class="col-span-3 text-center"><span class="px-2 py-0.5 bg-pos-primary font-sans font-black uppercase tracking-wide rounded text-[9px] text-pos-navy">${tx.method}</span></div>
                         <div class="col-span-3 text-right font-black text-pos-navy">Rp ${tx.total.toLocaleString('id-ID')}</div>
                     </div>`;
             });
         };
 
-        // ================= MODUL 3: DATA BARANG VIEW & FORM CRUD =================
+        // ================= MODUL 3: DATA BARANG VIEW =================
         window.renderInventoryMasterTable = function() {
             const container = document.getElementById('inventory-table-rows');
             const query = document.getElementById('inventory-search-input').value.toLowerCase();
@@ -613,7 +608,7 @@
             const filtered = localInventoryDatabase.filter(x => x.name.toLowerCase().includes(query) || x.id.includes(query));
             filtered.forEach(item => {
                 container.innerHTML += `
-                    <div class="grid grid-cols-12 p-3.5 items-center hover:bg-slate-50 border-b last:border-none">
+                    <div class="grid grid-cols-12 p-3.5 items-center hover:bg-amber-50 border-b border-amber-100 last:border-none">
                         <div class="col-span-5">
                             <span class="font-black text-pos-navy block">${item.name}</span>
                             <span class="text-[10px] font-mono text-pos-slate block uppercase">SKU CODE: ${item.id}</span>
@@ -621,7 +616,7 @@
                         <div class="col-span-4 font-mono font-bold text-pos-success">Rp ${item.price.toLocaleString('id-ID')}</div>
                         <div class="col-span-1 text-center font-mono font-black">${item.stock}</div>
                         <div class="col-span-2 text-center space-x-2 font-bold text-[10px] uppercase">
-                            <span onclick="openFormBarangModal('${item.id}')" class="text-pos-primary cursor-pointer">Edit</span>
+                            <span onclick="openFormBarangModal('${item.id}')" class="text-pos-navy underline cursor-pointer">Edit</span>
                             <span onclick="deleteProductMasterItem('${item.id}')" class="text-pos-error cursor-pointer">Hapus</span>
                         </div>
                     </div>`;
@@ -658,11 +653,9 @@
             const stock = parseInt(document.getElementById('form-barang-stock').value) || 0;
 
             if (id) {
-                // Perbarui data yang sudah ada
                 const target = localInventoryDatabase.find(x => x.id === id);
                 if (target) { target.name = name; target.price = price; target.stock = stock; }
             } else {
-                // Tambah data barang baru (Auto-Generate Unique ID 8 Digit)
                 const generatedSKU = "1" + Math.floor(1000000 + Math.random() * 9000000).toString().substring(0,7);
                 localInventoryDatabase.push({ id: generatedSKU, name, price, stock });
             }
@@ -673,7 +666,7 @@
         });
 
         window.deleteProductMasterItem = function(id) {
-            if (confirm(`Hapus item ${id} dari cloud master database?`)) {
+            if (confirm(`Hapus item ${id}?`)) {
                 localInventoryDatabase = localInventoryDatabase.filter(x => x.id !== id);
                 commitDatabaseChangesToStorage();
                 renderInventoryMasterTable();
@@ -688,15 +681,14 @@
 
             localTransactionsHistory.forEach(tx => {
                 if (tx.date === todayStr) omsetHariIni += tx.total;
-                omsetBulanan += tx.total; // Fallback akumulasi log berjalan
+                omsetBulanan += tx.total;
             });
 
             document.getElementById('rep-omset-hari-ini').innerText = `Rp ${omsetHariIni.toLocaleString('id-ID')}`;
-            document.getElementById('rep-omset-mingguan').innerText = `Rp ${(omsetBulanan * 0.25).toLocaleString('id-ID')}`; // Estimasi proporsional
+            document.getElementById('rep-omset-mingguan').innerText = `Rp ${(omsetBulanan * 0.25).toLocaleString('id-ID')}`;
             document.getElementById('rep-omset-bulanan').innerText = `Rp ${omsetBulanan.toLocaleString('id-ID')}`;
             document.getElementById('rep-total-transaksi').innerText = `${localTransactionsHistory.length} Nota`;
 
-            // Pemetaan Rangking Material Terlaris
             const itemMap = {};
             localTransactionsHistory.forEach(tx => {
                 tx.items.forEach(i => {
@@ -717,7 +709,7 @@
                 container.innerHTML += `
                     <div class="flex justify-between items-center py-2 text-xs">
                         <span>${index + 1}. <b>${name}</b></span>
-                        <span class="font-bold text-pos-primary">${itemMap[name]} Kuantitas Terjual</span>
+                        <span class="font-bold text-pos-navy">${itemMap[name]} Terjual</span>
                     </div>`;
             });
         }
@@ -736,7 +728,7 @@
             logs.forEach(l => {
                 container.innerHTML += `
                     <div class="flex justify-between items-center py-2 text-xs">
-                        <span>Nota <b class="text-pos-primary">${l.id}</b> sukses terbit via ${l.method}</span>
+                        <span>Nota <b class="text-pos-navy">${l.id}</b> sukses via ${l.method}</span>
                         <span class="font-black text-pos-success">Rp ${l.total.toLocaleString('id-ID')}</span>
                     </div>`;
             });
@@ -764,16 +756,11 @@
                     commitDatabaseChangesToStorage();
                     alert("Data internal berhasil diperbarui!");
                     navigateTo('dashboard');
-                } else { alert("Format manifes cadangan tidak valid."); }
-            } catch (e) { alert("Gagal memproses berkas enkripsi teks: " + e.message); }
+                } else { alert("Format cadangan tidak valid."); }
+            } catch (e) { alert("Gagal memproses file cadangan."); }
         };
 
-        // Bootstrap load initialization
         window.addEventListener('DOMContentLoaded', () => {
-            // Sinkronisasi konfigurasi global awal
-            document.getElementById('cfg-tax-rate').value = systemConfiguration.tax;
-            document.getElementById('cfg-discount-rate').value = systemConfiguration.discount;
-            document.getElementById('cfg-store-name').value = systemConfiguration.store;
             navigateTo('dashboard');
         });
     </script>
