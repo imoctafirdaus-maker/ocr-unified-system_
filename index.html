@@ -9,7 +9,6 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
-    <!-- Tailwind CSS Production Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -20,13 +19,13 @@
                             canvas: '#FFFFFF',
                             bgLight: '#F8FAFC',
                             bgCard: '#FFFFFF',
-                            primary: '#1D4ED8', /* Biru Profesional Premium */
+                            primary: '#1D4ED8',
                             primaryHover: '#1E40AF',
-                            navy: '#0F172A', /* Hitam Slate Eksklusif */
-                            slate: '#475569', /* Abu-abu Text */
-                            success: '#10B981', /* Hijau Transaksi Sukses */
-                            warning: '#F97316', /* Oranye Peringatan */
-                            error: '#EF4444', /* Merah Kesalahan */
+                            navy: '#0F172A',
+                            slate: '#475569',
+                            success: '#10B981',
+                            warning: '#F97316',
+                            error: '#EF4444',
                             border: '#E2E8F0'
                         }
                     },
@@ -46,7 +45,6 @@
 </head>
 <body class="bg-enterprise-bgLight text-enterprise-navy font-sans min-h-screen select-none antialiased">
 
-    <!-- ================= SYSTEM TOP HEADER STATIONS ================= -->
     <nav class="bg-enterprise-canvas border-b border-enterprise-border px-6 py-4 fixed left-0 right-0 top-0 z-40 shadow-sm">
         <div class="flex justify-between items-center max-w-7xl mx-auto text-xs">
             <div class="space-y-0.5">
@@ -63,12 +61,9 @@
         </div>
     </nav>
 
-    <!-- CONTAINER CORE ROUTER VIEWPORTS -->
     <div class="pt-20 pb-36 px-6 max-w-7xl mx-auto min-h-screen flex flex-col">
 
-        <!-- ================= LAYER 0: CENTRAL CORE DASHBOARD ================= -->
         <section id="view-dashboard" class="space-y-6 py-4 animate-fade-in">
-            <!-- Bisnis Summary Premium Cards Grid -->
             <div class="grid grid-cols-2 lg:grid-cols-5 gap-4">
                 <div class="bg-enterprise-canvas p-5 rounded-2xl border border-enterprise-border shadow-premium">
                     <span class="text-[9px] font-black text-enterprise-slate uppercase tracking-widest block">Total Transaksi</span>
@@ -92,7 +87,6 @@
                 </div>
             </div>
 
-            <!-- Akses Cepat Tombol Menu Utama Ukuran Besar -->
             <div class="space-y-3">
                 <h4 class="text-[10px] font-black uppercase text-enterprise-slate tracking-widest">AKSI CEPAT OPERASIONAL</h4>
                 <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5">
@@ -120,23 +114,18 @@
             </div>
         </section>
 
-        <!-- ================= LAYER 1: HALAMAN POS KASIR ================= -->
         <section id="view-pos-kasir" class="hidden space-y-4 py-2 flex-grow">
-            <!-- Search Control Row -->
             <div class="bg-enterprise-canvas p-4 rounded-2xl border border-enterprise-border shadow-premium flex gap-3">
                 <input type="text" id="pos-search-input" oninput="searchCatalogQuery()" placeholder="Cari material berdasarkan nama barang atau kode barang unik..." class="w-full p-3.5 bg-enterprise-bgLight border border-enterprise-border rounded-xl text-xs font-bold tracking-wide text-enterprise-navy focus:outline-none focus:border-enterprise-primary">
                 <button onclick="openFormBarangModal()" class="px-6 py-3.5 bg-enterprise-primary hover:bg-enterprise-primaryHover text-white text-xs font-black uppercase tracking-wider rounded-xl active:scale-95 transition">Tambah Barang Baru</button>
             </div>
 
-            <!-- Split Grid Workspace Workspace -->
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
-                <!-- Dropdown Pencarian Catalog List (Left 5 Columns) -->
                 <div class="lg:col-span-5 bg-enterprise-canvas p-4 rounded-2xl border border-enterprise-border shadow-premium flex flex-col max-h-[50vh]">
                     <h4 class="text-[10px] font-black uppercase tracking-wider text-enterprise-slate border-b pb-2 mb-3">Hasil Pencarian SKU Material</h4>
                     <div id="pos-filtered-catalog" class="space-y-1.5 overflow-y-auto pr-1 flex-grow hide-scrollbar"></div>
                 </div>
 
-                <!-- Main Cart Items Manifest Table Station (Right 7 Columns) -->
                 <div class="lg:col-span-7 bg-enterprise-canvas p-5 rounded-2xl border border-enterprise-border shadow-premium flex flex-col justify-between min-h-[50vh]">
                     <div class="w-full">
                         <div class="grid grid-cols-12 text-[10px] font-black text-enterprise-slate uppercase tracking-wider border-b pb-2.5 mb-3">
@@ -150,7 +139,6 @@
             </div>
         </section>
 
-        <!-- ================= LAYER 2: HALAMAN TRANSAKSI (RIWAYAT) ================= -->
         <section id="view-transaksi" class="hidden space-y-4 py-2 animate-fade-in">
             <div class="bg-enterprise-canvas p-4 rounded-2xl border border-enterprise-border shadow-premium flex flex-col sm:flex-row gap-3">
                 <input type="text" id="tx-search-input" oninput="renderTransactionHistoryList()" placeholder="Cari berdasarkan nomor nota transaksi..." class="w-full p-3 bg-enterprise-bgLight border border-enterprise-border rounded-xl text-xs font-bold focus:outline-none">
@@ -167,7 +155,6 @@
             </div>
         </section>
 
-        <!-- ================= PANEL LAYER 3: DATA BARANG ================= -->
         <section id="view-data-barang" class="hidden space-y-4 py-2 animate-fade-in">
             <div class="bg-enterprise-canvas p-4 rounded-2xl border border-enterprise-border shadow-premium flex justify-between items-center gap-3">
                 <input type="text" id="inventory-search-input" oninput="renderInventoryMasterTable()" placeholder="Cari nama barang atau kode barang..." class="w-full sm:w-80 p-3 bg-enterprise-bgLight border border-enterprise-border rounded-xl text-xs font-bold focus:outline-none">
@@ -184,7 +171,6 @@
             </div>
         </section>
 
-        <!-- ================= PANEL LAYER 4: LAPORAN PENJUALAN ================= -->
         <section id="view-laporan" class="hidden space-y-5 py-2 animate-fade-in">
             <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="p-5 bg-enterprise-canvas rounded-2xl border border-enterprise-border shadow-premium">
@@ -211,7 +197,6 @@
             </div>
         </section>
 
-        <!-- ================= PANEL LAYER 5: PENGATURAN ================= -->
         <section id="view-pengaturan" class="hidden max-w-xl mx-auto space-y-4 py-2 animate-fade-in text-xs">
             <div class="bg-enterprise-canvas p-5 rounded-2xl border border-enterprise-border shadow-premium space-y-4">
                 <h4 class="text-xs font-black uppercase text-enterprise-navy tracking-wider border-b pb-2">Konfigurasi Toko & Keuangan</h4>
@@ -242,7 +227,6 @@
 
     </div>
 
-    <!-- ================= PERSISTENT BOTTOM LOCK ORDER SUMMARY WINDOW ================= -->
     <div id="bottom-dock-summary" class="hidden bg-enterprise-canvas border-t border-enterprise-border fixed bottom-16 left-0 right-0 z-40 shadow-dock p-5">
         <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-4 text-xs">
             <div class="grid grid-cols-4 gap-4 sm:flex sm:gap-8 font-mono text-enterprise-slate">
@@ -255,7 +239,6 @@
         </div>
     </div>
 
-    <!-- GLOBAL INDUSTRIAL NAVIGATION MENU SHORTCUTS BAR -->
     <nav class="bg-enterprise-navy border-t border-slate-800 fixed bottom-0 left-0 right-0 z-50 shadow-2xl">
         <div class="grid grid-cols-5 max-w-lg mx-auto text-center py-3 text-[10px] font-black tracking-wider text-slate-400">
             <button onclick="navigateTo('dashboard')" id="nav-dashboard" class="space-y-0.5 text-white">HOME</button>
@@ -266,7 +249,6 @@
         </div>
     </nav>
 
-    <!-- ================= WINDOW FRAME 1: PAYMENT BILLING MODAL INTERFACE ================= -->
     <div id="modal-payment" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/70">
         <div class="bg-enterprise-canvas p-6 rounded-2xl max-w-md w-full shadow-2xl space-y-4 text-xs">
             <div class="flex justify-between items-center border-b pb-2.5">
@@ -296,7 +278,6 @@
         </div>
     </div>
 
-    <!-- ================= WINDOW FRAME 2: STRUK DIGITAL INTERFACE ================= -->
     <div id="modal-receipt" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/70">
         <div class="bg-enterprise-canvas p-6 rounded-2xl max-w-sm w-full shadow-2xl space-y-4 text-xs">
             <div class="border-2 border-dashed border-enterprise-border p-4 space-y-3 font-mono bg-slate-50 rounded-xl" id="print-area">
@@ -324,7 +305,6 @@
         </div>
     </div>
 
-    <!-- ================= WINDOW FRAME 3: CRUD DATA BARANG MODAL INTERFACE ================= -->
     <div id="modal-barang-form" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4 bg-slate-950/70">
         <div class="bg-enterprise-canvas p-5 rounded-2xl max-w-sm w-full shadow-2xl space-y-4 text-xs">
             <div class="flex justify-between items-center border-b pb-2">
@@ -350,9 +330,7 @@
         </div>
     </div>
 
-    <!-- CORE INTEGRATED ARCHITECTURE SCRIPT -->
     <script>
-        // CENTRAL DATABASE INSTANCE STATES (LOCAL PERSISTENT STORAGE CAPABILITY)
         let localInventoryDatabase = JSON.parse(localStorage.getItem('ent_pos_items')) || [
             { id: "10024587", name: "Baja Konstruksi H-Beam 150", price: 2450000, stock: 85 },
             { id: "84572931", name: "Semen Portland Komposit 50kg", price: 72000, stock: 450 },
@@ -591,7 +569,7 @@
 
             if (selectedPaymentMethodState === 'Tunai') {
                 cashReceived = parseFloat(document.getElementById('pay-cash-received').value) || 0;
-                if (cashReceived < totalBill) { alert("Transaksi Ditolak: Nominal pembayaran kurang dari total tagihan."); return; }
+                if (cashReceived < totalBill) { alert("Transaksi Ditolak: Nominal pembayaran kurang."); return; }
             }
 
             const receiptID = "TX-" + Date.now().toString().substring(4, 13);
@@ -608,7 +586,6 @@
                 items: [...posActiveCartRows]
             };
 
-            // Deduksi Pengurangan Kuantitas Stok Secara Real-Time
             posActiveCartRows.forEach(cartItem => {
                 const targetMaster = localInventoryDatabase.find(x => x.id === cartItem.id);
                 if (targetMaster) targetMaster.stock -= cartItem.qty;
@@ -617,7 +594,6 @@
             localTransactionsHistory.unshift(txLogItem);
             commitDatabaseChangesToStorage();
 
-            // Sesi Penyusunan Output Struk Digital Premium
             document.getElementById('modal-payment').classList.add('hidden');
             document.getElementById('modal-receipt').classList.remove('hidden');
             
@@ -731,7 +707,6 @@
                 const target = localInventoryDatabase.find(x => x.id === id);
                 if (target) { target.name = name; target.price = price; target.stock = stock; }
             } else {
-                // Pembuatan kode numerik unik otomatis (8 digit angka murni)
                 const generatedSKU = Math.floor(10000000 + Math.random() * 90000000).toString();
                 localInventoryDatabase.push({ id: generatedSKU, name, price, stock });
             }
@@ -750,7 +725,7 @@
         };
 
         // ================= MODUL 4: ANALITIK LAPORAN PENJUALAN =================
-        function renderStatisticalReportDashboard() {
+        window.renderStatisticalReportDashboard = function() {
             let totalRevenueSum = 0;
             localTransactionsHistory.forEach(x => totalRevenueSum += x.total);
 
@@ -781,12 +756,12 @@
                         <span class="font-black text-enterprise-primary">${itemMap[name]} Unit Terjual</span>
                     </div>`;
             });
-        }
+        };
 
         // ================= INTEGRASI DASHBOARD UTAMA (HALAMAN AWAL) =================
-        function renderDashboardAnalyticsOverview() {
+        window.renderDashboardAnalyticsOverview = function() {
             const todayStr = new Date().toISOString().split('T')[0];
-            let omsetHari Ini = 0;
+            let omsetHariIni = 0;
             let itemsSoldCounter = 0;
             let uniqueCusts = new Set();
 
@@ -795,7 +770,7 @@
                 omsetHariIni += tx.total;
                 tx.items.forEach(i => {
                     itemsSoldCounter += i.qty;
-                    uniqueCusts.add(tx.id.substring(3,7)); // Simulasi distingsi pelanggan
+                    uniqueCusts.add(tx.id.substring(3,7));
                 });
             });
 
@@ -806,7 +781,7 @@
 
             const avgTicketVal = todayTransactions.length > 0 ? omsetHariIni / todayTransactions.length : 0;
             document.getElementById('dash-avg-ticket').innerText = `Rp ${Math.floor(avgTicketVal).toLocaleString('id-ID')}`;
-        }
+        };
 
         // ================= ENGINE BACKUP & RESTORE DATA MANIFES =================
         window.executeDataBackupDownload = function() {
@@ -830,11 +805,10 @@
                     commitDatabaseChangesToStorage();
                     alert("Database lokal sukses disinkronkan!");
                     navigateTo('dashboard');
-                } else { alert("Format manifes cadangan tidak valid."); }
-            } catch (e) { alert("Gagal memproses unggahan enkripsi data."); }
+                } else { alert("Format cadangan tidak valid."); }
+            } catch (e) { alert("Gagal memproses file cadangan."); }
         };
 
-        // Bootstrap load initialization sequence
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('cfg-tax-rate').value = systemConfiguration.tax;
             document.getElementById('cfg-discount-rate').value = systemConfiguration.discount;
